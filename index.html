@@ -4,9 +4,27 @@
     <title>My Static Website</title>
   </head>
   <body>
-    <h1>My Static Website</h1>
+
+
+    <h1>iOS x Arduino Nano 33 BLE</h1>
     <p>
-      Hello, I'm online, and everyone can see me!
+      Test de connection
     </p>
+
+    <button onClick="connectToDeviceAndSubscribeToUpdates()">Connect to Bluetooth device</button>
+
+
   </body>
+
+  <script type="text/javascript">
+  	
+  	const connectToDeviceAndSubscribeToUpdates = async () => {
+	const device = await navigator.bluetooth
+	      .requestDevice({
+	          filters: [{ services: ['battery_service']}
+	      });
+	};
+
+
+  </script>
 </html>
