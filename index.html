@@ -1,30 +1,41 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>iOSxBLE</title>
+    <title>iOS x BLE</title>	
+    <link rel="stylesheet" href="css/style.css">
+	<script src="js/javascript.js"></script>
   </head>
   <body>
 
 
-    <h1>iOS x Arduino Nano 33 BLE</h1>
+    <h1>iOS x BLE</h1>
     <p>
-      Test de connection
+      	Test de connection entre un appareil iOS et un Arduino 33 BLE <br>
+      	<br>
+		<b> OBJECTIF : </b> <br>
+		- La connexion est effective et stable <br>
+		-      à chaque déconnexion la page notifie <br>
+		- La page récupère des informations d'une charactéristique BLE<br>
+		- La page peut écrire une charactéristique BLE et modifier la LED du nano <br>
+		- Le nano envoi des notification à chaque changement d'une caractéristique BLE<br>
     </p>
 
-    <button onClick="connectToDeviceAndSubscribeToUpdates()">Connect to Bluetooth device</button>
+    <button onClick="connectToDeviceAndSubscribeToUpdates()">Connect</button>
+
+	<p>---</p>
+
+
+    <button onClick="">Get Info</button>
+    <p id="informationsGet"> Info Get </p>
+    
+    <button onClick="">Led Red</button>
+    <button onClick="">Led Green</button>
+    <button onClick="">Led Blue</button>
+
+    <p id="informationsAuto"> Info Auto </p>
 
 
   </body>
 
-  <script type="text/javascript">
-  	
-  	const connectToDeviceAndSubscribeToUpdates = async () => {
-	const device = await navigator.bluetooth
-	      .requestDevice({
-	          filters: [{ services: ['battery_service']}]
-	      });
-	};
 
-
-  </script>
 </html>
