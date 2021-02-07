@@ -13,14 +13,14 @@
       	Test de connection entre un appareil iOS et un Arduino 33 BLE <br>
       	<br>
 		<b> OBJECTIF : </b> <br>
-		- La connexion est effective et stable <br>
+		- OK - La connexion est effective et stable <br>
 		-      à chaque déconnexion la page notifie <br>
-		- La page récupère des informations d'une charactéristique BLE<br>
-		- La page peut écrire une charactéristique BLE et modifier la LED du nano <br>
-		- Le nano envoi des notification à chaque changement d'une caractéristique BLE<br>
+		- OK - La page récupère des informations d'une charactéristique BLE<br>
+		- OK - La page peut écrire une charactéristique BLE et modifier la LED du nano <br>
+		- OK - Le nano envoi des notification à chaque changement d'une caractéristique BLE<br>
     </p>
 
-    <button onClick="connectToDeviceAndSubscribeToUpdates()">Connect</button>
+    <button onClick="connectToDeviceBLE()">Connect</button>
 
 	<p>---</p>
 
@@ -28,9 +28,9 @@
     <button onClick="">Get Info</button>
     <p id="informationsGet"> Info Get </p>
     
-    <button onClick="">Led Red</button>
-    <button onClick="">Led Green</button>
-    <button onClick="">Led Blue</button>
+    <button onClick="setCharacteristic(1)">Led Red</button>
+    <button onClick="setCharacteristic(2)">Led Green</button>
+    <button onClick="setCharacteristic(3)">Led Blue</button>
 
     <p id="informationsAuto"> Info Auto </p>
 
