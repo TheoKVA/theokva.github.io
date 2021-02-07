@@ -35,6 +35,9 @@ console.log(service);
 const characteristic = await service.getCharacteristic('00001234-0001-1000-8000-00805f9b34fb');
 console.log(characteristic);
 
+characteristic.startNotifications();
+characteristic.addEventListener('characteristicvaluechanged', handleCharacteristicValueChanged);
+
 const reading = await characteristic.readValue();
 console.log("value = " + reading.getUint8(0));
 
@@ -55,11 +58,9 @@ document.getElementById('informationsGet').innerHTML = reading.getUint8(0);
 
 };
 
-
 const handleCharacteristicValueChanged = (event) => {
-   console.log(event.target.value.getUint8(0));
+	console.log("new value was set = " + event.target.value.getUint8(0));
+	document.getElementById('informationsGet').innerHTML = event.target.value.getUint8(0);
 };
 
-function logWorld(characteristic) {
-    console.log("WE MADE IT");
-}
+
