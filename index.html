@@ -14,18 +14,22 @@
       	<br>
 		<b> OBJECTIF : </b> <br>
 		- OK - La connexion est effective et stable <br>
-		-      à chaque déconnexion la page notifie <br>
+		-      À chaque déconnexion la page notifie <br>
+		-	   Possibilité de déconnexion <br>
 		- OK - La page récupère des informations d'une charactéristique BLE<br>
 		- OK - La page peut écrire une charactéristique BLE et modifier la LED du nano <br>
 		- OK - Le nano envoi des notification à chaque changement d'une caractéristique BLE<br>
+		- Possibilité d'échanger une chaîne de char <br>
     </p>
 
-    <button onClick="connectToDeviceBLE()">Connect</button>
+    <button onClick="connectToBLEDevice()">Connect</button>
 
 	<p>---</p>
 
 
     <p id="informationsGet"> Info Auto </p>
+
+    <p id="informationsGet2"> STRING </p>
     
     <button onClick="setCharacteristic(1)">Led Red</button>
     <button onClick="setCharacteristic(2)">Led Green</button>

@@ -1,9 +1,9 @@
 
 // STRUCTURE DU CODE BLE
 
-var characteristic, characteristic2; // Déclare les variables à l'extérieur pour y accéder
+var characteristic, characteristic2, characteristic3; // Déclare les variables à l'extérieur pour y accéder
 
-const connectToDeviceBLE = async () => {
+const connectToBLEDevice = async () => {
 const device = await navigator.bluetooth
 	    .requestDevice({
 	    		acceptAllDevices: true,
@@ -18,18 +18,28 @@ console.log(server);
 const service = await server.getPrimaryService('00001234-0000-1000-8000-00805f9b34fb');
 console.log(service);
 
+
+// 1ere CHARACTERISTIQUE = READ / NOTIFY - GROWING NUMBER
 characteristic = await service.getCharacteristic('00001234-0001-1000-8000-00805f9b34fb');
 console.log(characteristic);
-
 characteristic.startNotifications();
 characteristic.addEventListener('characteristicvaluechanged', handleCharacteristicValueChanged);
 const reading = await characteristic.readValue();
 console.log("value = " + reading.getUint8(0));
-
 document.getElementById('informationsGet').innerHTML = reading.getUint8(0);
 
+// 2eme CHARACTERISTIQUE = WRITE - LED STATUS
 characteristic2 = await service.getCharacteristic('00001234-0002-1000-8000-00805f9b34fb');
 console.log(characteristic2);
+
+
+// 3eme CHARACTERISTIQUE = READ - STRING
+characteristic3 = await service.getCharacteristic('00001234-0003-1000-8000-00805f9b34fb');
+console.log(characteristic3);
+
+const decoder = new TextDecoder('utf-8');
+const reading3 = await characteristic3.readValue();
+console.log("value = " + decoder.decode(reading3));
 
 };
 
