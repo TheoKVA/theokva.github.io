@@ -1,41 +1,61 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>iOS x BLE</title>	
+    <title>Transition Today - Engine Dev</title>	
     <link rel="stylesheet" href="css/style.css">
-	<script src="js/javascript.js"></script>
+	<script src="js/connectBLE.js"></script>
   </head>
   <body>
+    <div class="column">
+
+    	<b> Column 1 </b>
+
+      <br> <br>
+      <form onsubmit="return false" oninput="o.value = parseInt(a.value) + parseInt(b.value)">
+        <input name="a" type="number" value="0" min="0" max="30" step="any"> Nucléaire <br>
+        <input name="b" type="number" value="0" min="0" max="30" step="any"> Fossile <br>
+        <input name="c" type="number" value="0" min="0" max="30" step="any"> Hydraulique <br>
+        <input name="d" type="number" value="0" min="0" max="30" step="any"> Solaire <br>
+        Output <output name="o"></output>
+      </form>
 
 
-    <h1>iOS x BLE</h1>
-    <p>
-      	Test de connection entre un appareil iOS et un Arduino 33 BLE <br>
-      	<br>
-		<b> OBJECTIF : </b> <br>
-		- OK - La connexion est effective et stable <br>
-		-      À chaque déconnexion la page notifie <br>
-		-	   Possibilité de déconnexion <br>
-		- OK - La page récupère des informations d'une charactéristique BLE<br>
-		- OK - La page peut écrire une charactéristique BLE et modifier la LED du nano <br>
-		- OK - Le nano envoi des notification à chaque changement d'une caractéristique BLE<br>
-		- Possibilité d'échanger une chaîne de char <br>
-    </p>
-
-    <button onClick="connectToBLEDevice()">Connect</button>
-
-	<p>---</p>
 
 
-    <p id="informationsGet"> Info Auto </p>
 
-    <p id="informationsGet2"> STRING </p>
-    
-    <button onClick="setCharacteristic(1)">Led Red</button>
-    <button onClick="setCharacteristic(2)">Led Green</button>
-    <button onClick="setCharacteristic(3)">Led Blue</button>
+    </div>
+    <div class="column">
+    	<b> Column 2 </b>
 
-  </body>
+
+
+    </div>
+    <div class="column">
+    	<b> Column 3 </b>
+
+
+
+    </div>
+    <div class="column">
+
+    	  <p><b> BLE </b></p>
+        <br>
+
+        <p> BLEstatut : <BLE id="BLEstatut"> Unconnected </BLE> </p>
+        <button onClick="connectBLE()">Connect</button>
+        <button onClick="disconnectBLE()">Disconnect</button>
+        <button onClick="reconnectBLE()">Reconnect</button>
+        <p><br>¯¯¯</p>
+        <p> BLEinfo1 : <BLE id="BLEinfo1"> notAssigned </BLE> </p>
+        <p> BLEinfo3 : <BLE id="BLEinfo3"> notAssigned </BLE> </p>
+        <br>
+        <button onClick="setBLEchar2(0)">Led OFF</button>
+        <button onClick="setBLEchar2(1)">Led Red</button>
+        <button onClick="setBLEchar2(2)">Led Green</button>
+        <button onClick="setBLEchar2(3)">Led Blue</button>
+
+    </div>
+</body>
 
 
 </html>
