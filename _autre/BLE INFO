@@ -1,0 +1,138 @@
+
+
+INFO ARDUINO BLE
+
+  CENTRAL ───Read/Write/GetNotify───> PERIPHERAL
+(Computer)		│					  (Arduino)
+				│
+				├─> READ : ask the peripheral to send back the current value of the characteristic
+				├─> WRITE : modify the value of the characteristic
+				└─> INDICATE / NOTIFY : ask to continuously send updated values of the characteristic
+
+
+
+BLE Peripheral
+ │
+ └─> SERVICE
+ 		│
+ 		└─> CHARACTERISTICS
+
+
+
+	SERVICE
+	Can be defined or use standard.
+		└─> DEFINED : 128-bit UUID
+		└─> STANDARD : 16-bit UUID
+
+	CHARACTERISTICS
+		└─> UP TO 512-bit
+		└─> STANDARD : 16-bit UUID
+
+
+
+
+┌─────────────────────────────┐
+│ TYPICAL STRUCTURE - ARDUINO │
+└─────────────────────────────┘
+
+BLEService MyService("19B10000-E8F2-537E-4F6C-D104768A1214");  	-> DEFINI LE NOM DU SERVICE
+
+																-> DEFINI LES CHARACTERISTICS
+BLEByteCharacteristic MyCharacteristic("19B10001-E8F2-537E-4F6C-D104768A1214", BLERead | BLEWrite);
+BLEUnsignedCharCharacteristic MyCharacteristic("2A19",  BLERead | BLENotify);
+
+	BLECharacteristic(uuid, properties, value, valueSize)
+	BLECharacteristic(uuid, properties, stringValue)
+											(value as a string)
+		CHARACTERISTICS
+			BLEBoolCharacteristic 
+			BLEBooleanCharacteristic
+			BLECharCharacteristic
+			BLEUnsignedCharCharacteristic
+			BLEByteCharacteristic
+			BLEShortCharacteristic
+			BLEUnsignedShortCharacteristic
+			BLEWordCharacteristic
+			BLEIntCharacteristic
+			BLEUnsignedIntCharacteristic
+			BLELongCharacteristic
+			BLEUnsignedLongCharacteristic
+			BLEFloatCharacteristic
+			BLEDoubleCharacteristic
+
+				PROPERTIES
+					BLEBroadcast
+					BLERead
+					BLEWriteWithoutResponse
+					BLEWrite
+					BLENotify
+					BLEIndicate
+
+
+void setup() {
+	Serial.begin(9600); -> DEBUG
+  	while (!Serial);
+
+  	if (!BLE.begin()) { -> INCASE
+	    Serial.println("starting BLE failed!");
+	    while (1);
+  	}
+
+
+  	BLE.setLocalName("CustomName");      -> NOM DU PERIPHERAL VERS L?EXTERIEUR
+  	BLE.setDeviceName("CustomName");	 -> NOM DU PERIPHERAL VERS L?INTERIEUR
+
+  		BLE.setAdvertisedService(MyService);   -> CREER UN SERVICE
+
+  			MyService.addCharacteristic(MyCharacteristic);	-> CREER UNE CHARACTERISTIC
+
+  				MyCharacteristic.setEventHandler(BLEWritten, functionHandler1); -> EVENT HANDLER 
+
+  				MyCharacteristic.writeValue(0);  -> MET UNE VALEUR DEFAULT
+
+  		BLE.addService(MyService);  		 -> AJOUTE LE SERVICE
+
+  
+  	BLE.setEventHandler(BLEConnected, blePeripheralConnectHandler); -> EVENT HANDLER POUR DEBUG
+  	BLE.setEventHandler(BLEDisconnected, blePeripheralDisconnectHandler);
+
+
+	BLE.advertise(); -> COMMENCE
+
+
+}
+
+void loop() {
+    BLE.poll();
+}
+
+
+
+void blePeripheralConnectHandler(BLEDevice central) {
+	Serial.print("Connected event, central: ");
+	Serial.println(central.address());
+}
+
+void blePeripheralDisconnectHandler(BLEDevice central) {
+	// central disconnected event handler
+	Serial.print("Disconnected event, central: ");
+	Serial.println(central.address());
+}
+
+void functionHandler1(BLEDevice central, BLECharacteristic characteristic) {
+  	// central wrote new value to characteristic, update LED
+  	Serial.print("Characteristic event, written: ");
+	Serial.println( MyCharacteristic.value() );
+}
+
+
+
+
+
+
+
+
+
+
+
+

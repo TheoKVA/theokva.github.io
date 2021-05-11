@@ -10,17 +10,26 @@ button {
 	font-size: 12px;
 }
 
+select { 
+	font-size: 12px;
+}
+
 p {
     margin: 0;
     padding: 0;
 }
 
-input {
-	width: 40px;
+input[type="number"] {
+	width: 30px;
+}
+
+input[type="range"] {
+	width: 80px;
+	height: 7px;
 }
 
 .column {
-/*    border: 1px solid red;*/
+    /*border: 1px solid grey;*/
 	float: left;
 	box-sizing: border-box;
 	width: calc((25%));
