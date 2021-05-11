@@ -1,4 +1,16 @@
 
-modele1
+-----------
+MARTINE N 1
+-----------
 
-infos à mettre
+Cette version de l'oracle se base sur les fibos du pattern A-B-C-D + RSI Extrêmes
+Echelle réduite du SOL + MITH 2 mois
+Methode = Classification
+Condition = Réussite fibResult > 1.1
+Type de NN = Classification 3 Layers - 32 neurones
+Loss minimum atteint = 0.6
+
+> Martine predicted right WIN 774  out of 1208 -> 64% 
+> Martine predicted right LOST 1639  out of 2283 -> 71%
+
+Les résultats sont consistants en BEAR - BULL
