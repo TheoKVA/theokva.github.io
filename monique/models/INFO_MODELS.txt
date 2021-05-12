@@ -1,0 +1,39 @@
+
+
+-----------
+MONIQUE N 1
+-----------
+
+Cette version de la voynate se base sur les fibos du pattern A-B-C-D + RSI Extrêmes
+Echelle réduite du SOL + MITH 2 mois
+Methode = Classification
+Condition = Réussite fibResult > 1.1
+Type de NN = Classification 3 Layers - 32 neurones
+Loss minimum atteint = 0.6
+
+> Martine predicted right WIN 774  out of 1208 -> 64% 
+> Martine predicted right LOST 1639  out of 2283 -> 71%
+
+Les résultats sont consistants en BEAR - BULL
+
+
+
+
+-----------
+MONIQUE N 2
+-----------
+
+Cette version de la voyante se base sur les fibos du pattern A-B-C-D + RSI Extrêmes
+Echelle BULL : SOL MITH BTT BNB CAKE + en BEAR : QTUM ADA WTC AION LINK
+Methode = Classification
+Condition = Réussite fibResult > 1.1
+Type de NN = Classification 3 Layers - 32 neurones
+Loss minimum atteint = 0.6
+
+> Martine predicted right WIN 387 out of 567 -> 68%
+> Martine predicted right LOST 1893 out of 2924 -> 64%
+
+Les résultats sont consistants en BEAR - BULL
+
+
+
