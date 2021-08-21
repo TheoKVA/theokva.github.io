@@ -56,7 +56,7 @@
     // VARIABLES  GENERALES
 
         var bluetoothDevice = null ;
-        var characteristic1, characteristic2, characteristic3; // Déclare les variables pour un acces ulterieur
+        var characteristicTX, characteristicRX; // Déclare les variables pour un acces ulterieur
 
         const decoder = new TextDecoder('utf-8'); // Decodeur pour pouvoir lire les strings
 
@@ -73,9 +73,9 @@
                 	    .requestDevice({
                 	    		acceptAllDevices: false,
                 	    		filters: [
-                				    {name: 'Transition Today',} // Spécifie le nom pour filter les appareils
+                				    {name: 'PROTOBOARD V1',} // Spécifie le nom pour filter les appareils
                 				],
-                	    		optionalServices: ['00001234-0000-1000-8000-00805f9b34fb'] // Annonce le nom du service visé
+                	    		optionalServices: ['0512249e-0286-11ec-9a03-0242ac130003'] // Annonce le nom du service visé
                 	    	})
                         .catch(error => { console.error(error); });
         console.log("Bluetooth Device connected : " + bluetoothDevice.name); // LOG de Connexion
@@ -85,28 +85,21 @@
         const server = await bluetoothDevice.gatt.connect();
         console.log(server);
 
-        const service = await server.getPrimaryService('00001234-0000-1000-8000-00805f9b34fb');
+        const service = await server.getPrimaryService('0512249e-0286-11ec-9a03-0242ac130003');
         console.log(service);
 
 
-        // 1ere CHARACTERISTIQUE = READ / NOTIFY - GROWING NUMBER
-        characteristic1 = await service.getCharacteristic('00001234-0001-1000-8000-00805f9b34fb');
-        characteristic1.startNotifications(); // Notifications
-        characteristic1.addEventListener('characteristicvaluechanged', Characteristic1Changed);
+        // 1ere CHARACTERISTIQUE TX = ON RECOIE - READ / NOTIFY
+        characteristicTX = await service.getCharacteristic('051227fa-0286-11ec-9a03-0242ac130003');
+        characteristicTX.startNotifications(); // Notifications
+        characteristicTX.addEventListener('characteristicvaluechanged', CharacteristicTXchanged);
 
-        const reading = await characteristic1.readValue();
-        console.log("characteristic1 value = " + reading.getUint8(0));
-        document.getElementById('BLEinfo1').innerHTML = reading.getUint8(0);
+        const readingTX = await characteristicTX.readValue();
+        console.log("characteristicTX value = " + decoder.decode(readingTX));
+        document.getElementById('BLEinfoTX').innerHTML = decoder.decode(readingTX);
 
-        // 2eme CHARACTERISTIQUE = WRITE - LED STATUS
-        characteristic2 = await service.getCharacteristic('00001234-0002-1000-8000-00805f9b34fb');
-
-        // 3eme CHARACTERISTIQUE = READ - STRING
-        characteristic3 = await service.getCharacteristic('00001234-0003-1000-8000-00805f9b34fb');
-
-        const reading3 = await characteristic3.readValue();
-        console.log("characteristic3 value = " + decoder.decode(reading3)); // Permet de lire la string
-        document.getElementById('BLEinfo3').innerHTML = decoder.decode(reading3);
+        // 2eme CHARACTERISTIQUE RX = ON ENVOI - WRITE 
+        characteristicRX = await service.getCharacteristic('0512270a-0286-11ec-9a03-0242ac130003');
 
         };
 
@@ -164,19 +157,19 @@
 
 // FONCTIONS POUR LIRE LES NOUVELLES CHARACTERISTIQUES
 
-    const Characteristic1Changed = (event) => {
+    const CharacteristicTXchanged = (event) => {
     	console.log("New value was set = " + event.target.value.getUint8(0));
-    	document.getElementById('BLEinfo1').innerHTML = event.target.value.getUint8(0); // Change le HTML
+    	document.getElementById('BLEinfoTX').innerHTML = event.target.value.getUint8(0); // Change le HTML
     };
 
 
 // FONCTIONS POUR ECRIRE CHARACTERISTIQUE2 DEPUIS L'HTML
 
     function setBLEchar2(inputToPut) {
-      if (characteristic2 == undefined) return; // console pas une erreur 
+      if (characteristicRX == undefined) return; // console pas une erreur 
     	const buffer = new Uint8Array(2);
     	buffer[0] = inputToPut;
-    	characteristic2.writeValue(buffer);
+    	characteristicRX.writeValue(buffer);
     };
 
 

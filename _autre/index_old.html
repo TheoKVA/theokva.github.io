@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<html>
+
+<head>
+	<title>Transition Today - Engine Dev</title>	
+	<link rel="stylesheet" href="css/style.css">
+	<script src="js/connectBLE.js"></script> <!-- SCRIPT POUR LE BLE -->
+	<script src="js/gameTransitionToday.js"></script> <!-- SCRIPT DU JEU -->
+</head>
+
+ 
+<body>
+
+	<div class="column">
+		<b> - BLE CONNECT - </b>
+		<br>
+		<br> BLEstatut : <BLE id="BLEstatut"> Unconnected </BLE>
+		<br>
+		<button onClick="connectBLE()">Connect</button>
+		<button onClick="disconnectBLE()">Disconnect</button>
+		<button onClick="reconnectBLE()">Reconnect</button>
+		<br>
+		<br> ¯¯¯
+		<br> BLEinfo1 : <BLE id="BLEinfo1"> notAssigned </BLE>
+		<br> BLEinfo3 : <BLE id="BLEinfo3"> notAssigned </BLE>
+		<br>
+		<br>
+		<button onClick="setBLEchar2(0)">OFF</button>
+		<button onClick="setBLEchar2(1)">Red</button>
+		<button onClick="setBLEchar2(2)">Green</button>
+		<button onClick="setBLEchar2(3)">Blue</button>
+		<br>
+		<br> ¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯
+		<br>
+		<br>
+		<b> BOARD </b>
+		<br>
+		<br> 
+		<form onsubmit="return false" oninput="o.value = a.value + b.value + c.value + d.value + e.value">
+			<input name="a" type="number" value="0" min="0" max="30" step="any"> Nucléaire <br>
+			<input name="b" type="number" value="0" min="0" max="30" step="any"> Fossile <br>
+			<input name="c" type="number" value="0" min="0" max="30" step="any"> Hydraulique <br>
+			<input name="d" type="number" value="0" min="0" max="30" step="any"> Solaire <br>
+			<br>
+			Information
+			<select name="e" id="pieceSelection">
+				<option value="0">Empty</option>
+				<option value="a">Nucléaire</option>
+				<option value="b">Fossile</option>
+				<option value="c">Hydraulique</option>
+				<option value="d">Solaire</option>
+			</select>
+			<br>
+			output : <output name="o"> &ofcir; </output>
+		</form>
+		<br> 
+		<br> <b> tourActuel : <out id="tourActuel"> &ofcir; </out> </b>
+		<br> tourRestants : <out id="tourRestants"> &ofcir; </out>
+		<br> <button onClick="">Tour suivant</button>
+		<br>
+		<br>¯¯¯
+		<br> <b> actionsRestantes : <out id="actionsRestantes"> &ofcir; </out> </b>
+		<br>
+		<br>
+		<br> <b> ImportTotal : <out id="ImportTotal"> &ofcir; </out> </b>
+		<br> importCombustible : <out id="importCombustible"> &ofcir; </out>
+		<br> &emsp; &rdsh; importNucl : <out id="importNucl"> &ofcir; </out>
+		<br> <i> &emsp; &emsp; importNuclPrix : <out id="importNuclPrix"> &ofcir; </out> /1k </i>
+		<br> &emsp; &rdsh; importGaz : <out id="importGaz"> &ofcir; </out>
+		<br> <i> &emsp; &emsp; importGazPrix : <out id="importGazPrix"> &ofcir; </out> /1k </i>
+		<br> &emsp; &rdsh; importFuel : <out id="importFuel"> &ofcir; </out>
+		<br> <i> &emsp; &emsp; importFuelPrix : <out id="importFuelPrix"> &ofcir; </out> /1k </i>
+		<br> importElec : <out id="importElec"> &ofcir; </out> 
+		<br> <i> importElecPrix : <out id="importElecPrix"> &ofcir; </out> /1k </i>
+		<br>
+		<br> 
+	</div>
+
+
+
+	<div class="column">
+		<b> INVESTISSEMENT </b>
+		<br>
+		<br> <input type="range" name="invest1" min="0" max="10" value="0" step="1" > invest1Value : <out id="invest1Value"> &ofcir; </out> 
+		<br> invest1Name : <out id="invest1Name"> &ofcir; </out> 
+		<!-- <br> invest1Description : <out id="invest1Description"> &ofcir; </out>  -->
+		<br> invest1Effet : <out id="invest1Effet"> &ofcir; </out> 
+		<br>
+		<br> <input type="range" name="invest2" min="0" max="10" value="0" step="1"> invest2Value : <out id="invest2Value"> &ofcir; </out> 
+		<br> invest2Name : <out id="invest2Name"> &ofcir; </out> 
+		<!-- <br> invest2Description : <out id="invest2Description"> &ofcir; </out>  -->
+		<br> invest2Effet : <out id="invest2Effet"> &ofcir; </out> 
+		<br>
+		<br> <input type="range" name="invest3" min="0" max="10" value="0" step="1"> invest3Value : <out id="invest3Value"> &ofcir; </out> 
+		<br> invest3Name : <out id="invest3Name"> &ofcir; </out> 
+		<!-- <br> invest3Description : <out id="invest3Description"> &ofcir; </out>  -->
+		<br> invest3Effet : <out id="invest3Effet"> &ofcir; </out> 
+		<br>
+		<br> <input type="range" name="invest4" min="0" max="10" value="0" step="1"> invest4Value : <out id="invest4Value"> &ofcir; </out> 
+		<br> invest4Name : <out id="invest4Name"> &ofcir; </out> 
+		<!-- <br> invest4Description : <out id="invest4Description"> &ofcir; </out>  -->
+		<br> invest4Effet : <out id="invest4Effet"> &ofcir; </out> 
+		<br>
+		<br> <input type="range" name="invest5" min="0" max="10" value="0" step="1"> invest5Value : <out id="invest5Value"> &ofcir; </out> 
+		<br> invest5Name : <out id="invest5Name"> &ofcir; </out> 
+		<!-- <br> invest5Description : <out id="invest5Description"> &ofcir; </out>  -->
+		<br> invest5Effet : <out id="invest5Effet"> &ofcir; </out> 
+		<br>
+		<br> <input type="range" name="invest6" min="0" max="10" value="0" step="1"> invest6Value : <out id="invest6Value"> &ofcir; </out> 
+		<br> invest6Name : <out id="invest6Name"> &ofcir; </out> 
+		<!-- <br> invest6Description : <out id="invest6Description"> &ofcir; </out>  -->
+		<br> invest6Effet : <out id="invest6Effet"> &ofcir; </out> 
+		<br>
+		<br> <input type="range" name="invest7" min="0" max="10" value="0" step="1"> invest7Value : <out id="invest7Value"> &ofcir; </out> 
+		<br> invest7Name : <out id="invest7Name"> &ofcir; </out> 
+		<!-- <br> invest7Description : <out id="invest7Description"> &ofcir; </out>  -->
+		<br> invest7Effet : <out id="invest7Effet"> &ofcir; </out> 
+		<br>
+		<br> <input type="range" name="invest8" min="0" max="10" value="0" step="1"> invest8Value : <out id="invest8Value"> &ofcir; </out> 
+		<br> invest8Name : <out id="invest8Name"> &ofcir; </out> 
+		<!-- <br> invest8Description : <out id="invest8Description"> &ofcir; </out>  -->
+		<br> invest8Effet : <out id="invest8Effet"> &ofcir; </out> 
+		<br> 
+	</div>
+
+
+
+	<div class="column">
+		<b> GRAPH </b>
+		<br> 
+		<br> &sqsub; hexogène &emsp; &barvee; import &emsp; &Cross; pertes
+		<br>
+		<br>¯¯¯
+		<br> <b> elecTotal : <out id="elecTotal"> &ofcir; </out> </b>
+		<br> &barvee; importElecTot : <out id="importElecTot"> &ofcir; </out>
+		<br> &emsp; &rdsh; importElecTauxNucl : <out id="importElecTauxNucl"> &ofcir; </out>
+		<br> &emsp; &rdsh; importElecTauxFossile : <out id="importElecTauxFossile"> &ofcir; </out>
+		<br> &emsp; &rdsh; importElecTauxGreen : <out id="importElecTauxGreen"> &ofcir; </out>
+		<br> &barvee; elecNucl : <out id="elecNucl"> &ofcir; </out>
+		<br> &sqsub; elecGreen : <out id="elecGreen"> &ofcir; </out>
+		<br> &Cross; elecPertes : <out id="elecPertes"> &ofcir; </out>
+		<br>
+		<br> <b> greenTotal : <out id="greenTotal"> &ofcir; </out> </b>
+		<br> &barvee; greenImport : <out id="greenImport"> &ofcir; </out>
+		<br> &sqsub; greenIndig : <out id="greenIndig"> &ofcir; </out>
+		<br> &Cross; greenPertes : <out id="greenPertes"> &ofcir; </out>
+		<br>
+		<br> <b> gazTotal : <out id="gazTotal"> &ofcir; </out> </b>
+		<br> &barvee; gazImport : <out id="gazImport"> &ofcir; </out>
+		<br> &sqsub; gazIndig : <out id="gazIndig"> &ofcir; </out>
+		<br> &Cross; gazPertes : <out id="gazPertes"> &ofcir; </out>
+		<br>
+		<br> <b> fossileTotal : <out id="fossileTotal"> &ofcir; </out> </b>
+		<br> &barvee; fossileImport : <out id="fossileImport"> &ofcir; </out>
+		<br> &sqsub; fossileIndig : <out id="fossileIndig"> &ofcir; </out>
+		<br> &Cross; fossilePertes : <out id="fossilePertes"> &ofcir; </out>
+		<br>
+		<br>¯¯¯
+		<br> <b> consoTotalMenages : <out id="consoTotalMenages"> &ofcir; </out> </b>
+		<br> elec: <out id="menagesTauxElec"> &ofcir; </out>
+		/ green: <out id="menagesTauxGreen"> &ofcir; </out>
+		/ gaz: <out id="menagesTauxGaz"> &ofcir; </out>
+		/ foss: <out id="menagesTauxFossile"> &ofcir; </out>
+		<br> 
+		<br> <b> consoTotalIndustrie : <out id="consoTotalIndustrie"> &ofcir; </out> </b>
+		<br> elec: <out id="industrieTauxElec"> &ofcir; </out>
+		/ green: <out id="industrieTauxGreen"> &ofcir; </out>
+		/ gaz: <out id="industrieTauxGaz"> &ofcir; </out>
+		/ foss: <out id="industrieTauxFossile"> &ofcir; </out>
+		<br> 
+		<br> <b> consoTotalTertiaire : <out id="consoTotalTertiaire"> &ofcir; </out> </b>
+		<br> elec: <out id="tertiaireTauxElec"> &ofcir; </out>
+		/ green: <out id="tertiaireTauxGreen"> &ofcir; </out>
+		/ gaz: <out id="tertiaireTauxGaz"> &ofcir; </out>
+		/ foss: <out id="tertiaireTauxFossile"> &ofcir; </out>
+		<br> 
+		<br> <b> consoTotalTransport : <out id="consoTotalTransport"> &ofcir; </out> </b>
+		<br> elec: <out id="transportTauxElec"> &ofcir; </out>
+		/ green: <out id="transportTauxGreen"> &ofcir; </out>
+		/ gaz: <out id="transportTauxGaz"> &ofcir; </out>
+		/ foss: <out id="transportTauxFossile"> &ofcir; </out>
+		<br> 
+		<br> 
+	</div>
+
+
+
+	<div class="column">
+		<b> CO2 </b>
+		<br>
+		<br> greenTotal : <out id="greenTotal"> &ofcir; </out>
+		<br> <i> &emsp; greenTotalPrct : <out id="greenTotalPrct"> &ofcir; </out>%</i>
+		<br> greenCO2rapport : [1:<out id="greenCO2rapport"> &ofcir; </out>]
+		<br> <b> greenCO2Total : <out id="greenCO2Total"> &ofcir; </out> </b>
+		<br> <i> &emsp; greenCO2Prct : <out id="greenCO2Prct"> &ofcir; </out>%</i>
+		<br> 
+		<br> elecTotal : <out id="elecTotal"> &ofcir; </out>
+		<br> <i> &emsp; elecTotalPrct : <out id="elecTotalPrct"> &ofcir; </out>%</i>
+		<br> elecCO2rapport : [1:<out id="elecCO2rapport"> &ofcir; </out>]
+		<br> <b> elecCO2Total : <out id="elecCO2Total"> &ofcir; </out> </b>
+		<br> <i> &emsp; elecCO2Prct : <out id="elecCO2Prct"> &ofcir; </out>%</i>
+		<br> 
+		<br> gazTotal : <out id="gazTotal"> &ofcir; </out>
+		<br> <i> &emsp; gazTotalPrct : <out id="gazTotalPrct"> &ofcir; </out>%</i>
+		<br> gazCO2rapport : [1:<out id="gazCO2rapport"> &ofcir; </out>]
+		<br> <b> gazCO2Total : <out id="gazCO2Total"> &ofcir; </out> </b>
+		<br> <i> &emsp; gazCO2Prct : <out id="gazCO2Prct"> &ofcir; </out>%</i>
+		<br> 
+		<br> fossileTotal : <out id="FossileTotal"> &ofcir; </out>
+		<br> <i> &emsp; fossileTotalPrct : <out id="fossileTotalPrct"> &ofcir; </out>%</i>
+		<br> fossileCO2rapport : [1:<out id="fossileCO2rapport"> &ofcir; </out>]
+		<br> <b> fossileCO2Total : <out id="fossileCO2Total"> &ofcir; </out> </b>
+		<br> <i> &emsp; fossileCO2Prct : <out id="fossileCO2Prct"> &ofcir; </out>%</i>
+		<br> 
+		<br>  
+		<br> <b> CO2Total : <out id="CO2Total"> &ofcir; </out> </b>
+		<br> <b> Objectif : <out id="Objectif"> &ofcir; </out>% </b>
+		<br> &emsp; &rdsh; <i> CO2tour1 : <out id="CO2tour1"> &ofcir; </out> </i>
+		<br> &emsp; &rdsh; <i> CO2tour2 : <out id="CO2tour2"> &ofcir; </out> </i>
+		<br> &emsp; &rdsh; <i> CO2tour3 : <out id="CO2tour3"> &ofcir; </out> </i>
+		<br> &emsp; &rdsh; <i> CO2tour4 : <out id="CO2tour4"> &ofcir; </out> </i>
+		<br> &emsp; &rdsh; <i> CO2tour5 : <out id="CO2tour5"> &ofcir; </out> </i>
+		<br> &emsp; &rdsh; <i> CO2tour6 : <out id="CO2tour6"> &ofcir; </out> </i>
+		<br> &emsp; &rdsh; <i> CO2tour7 : <out id="CO2tour7"> &ofcir; </out> </i>
+		<br> &emsp; &rdsh; <i> CO2tour8 : <out id="CO2tour8"> &ofcir; </out> </i>
+		<br> &emsp; &rdsh; <i> CO2tour9 : <out id="CO2tour9"> &ofcir; </out> </i>
+		<br> &emsp; &rdsh; <i> CO2tour10 : <out id="CO2tour10"> &ofcir; </out> </i>
+
+	</div>
+
+
+</body>
+</html>
+
