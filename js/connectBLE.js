@@ -159,7 +159,7 @@
 
     const CharacteristicTXchanged = (event) => {
     	console.log("New value was set = " + event.target.value); // +.getUint8(0)
-    	document.getElementById('BLEinfoTX').innerHTML = event.target.value;
+    	document.getElementById('BLEinfoTX').innerHTML = event.target.value.toString();
     };
 
 
