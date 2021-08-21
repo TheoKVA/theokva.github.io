@@ -158,8 +158,8 @@
 // FONCTIONS POUR LIRE LES NOUVELLES CHARACTERISTIQUES
 
     const CharacteristicTXchanged = (event) => {
-    	console.log("New value was set = " + event.target.value.getUint8(0));
-    	document.getElementById('BLEinfoTX').innerHTML = event.target.value.getUint8(0); // Change le HTML
+    	console.log("New value was set = " + event.target.value); // +.getUint8(0)
+    	document.getElementById('BLEinfoTX').innerHTML = event.target.value;
     };
 
 
@@ -173,7 +173,6 @@
 
     function setBLEchar2( str ) {
       // if (characteristicRX == undefined) return; // console pas une erreur 
-
     	// const buffer = new Uint8Array(6);
     	// buffer[0] = inputToPut;
 
@@ -182,11 +181,12 @@
         buffer[i] = str.charCodeAt(i);
       }
 
-      console.log("New value was set to = " + str);
-      console.log("New value was set to = " + buffer);
-      
     	try{ characteristicRX.writeValue(buffer) }
       catch(err){ alert(err); } ;
+
+      console.log("New value was set to = " + str);
+      console.log("Buffer = " + buffer);
+    	document.getElementById('BLEinfoRX').innerHTML = str;
     };
 
 
