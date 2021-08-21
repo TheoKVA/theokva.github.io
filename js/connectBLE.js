@@ -158,7 +158,9 @@
 // FONCTIONS POUR LIRE LES NOUVELLES CHARACTERISTIQUES
 
     const CharacteristicTXchanged = (event) => {
-    	alert("New value was set = " + event.target.value.toString('utf8')); // +.getUint8(0)
+    	console.log("New value was set = " + event.target.value.toString('utf8')); // +.getUint8(0)
+      alert(event.target.value.toString());
+
     	document.getElementById('BLEinfoTX').innerHTML = event.target.value.toString('utf8');
     };
 
