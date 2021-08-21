@@ -166,11 +166,14 @@
 // FONCTIONS POUR ECRIRE CHARACTERISTIQUE2 DEPUIS L'HTML
 
     function setBLEchar2( str ) {
+      console.log("HEY " + str);
+      console.log("str.length " + str.length);
       if (characteristicRX == undefined) return; // console pas une erreur 
       var buffer = new Uint8Array(str.length);
       for (var i=0, strLen=str.length; i < strLen; i++) {
         buffer[i] = str.charCodeAt(i);
       }
+      console.log("New value was set to = " + buffer);
     	characteristicRX.writeValue(buffer);
     };
 
