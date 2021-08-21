@@ -30,9 +30,9 @@ input[type="range"] {
 
 .column {
     /*border: 1px solid grey;*/
-	float: left;
-	box-sizing: border-box;
-	width: calc((25%));
+	/* float: left; */
+	/* box-sizing: border-box; */
+	/* width: calc((25%)); */
 	padding-top: 10px;
 	padding-left: 10px;
 	padding-right: 10px;
