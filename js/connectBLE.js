@@ -158,10 +158,22 @@
 // FONCTIONS POUR LIRE LES NOUVELLES CHARACTERISTIQUES
 
     const CharacteristicTXchanged = (event) => {
-    	console.log("New value was set = " + event.target.value.toString('utf8')); // +.getUint8(0)
-      alert(event.target.value.toString());
 
-    	document.getElementById('BLEinfoTX').innerHTML = event.target.value.toString('utf8');
+
+      const decoder = new TextDecoder('utf-8');
+      console.log(`New value was set = : ${decoder.decode(event.target.value)}`);
+
+    	// console.log("New value was set = " + event.target.value.toString('utf8')); // +.getUint8(0)
+      alert(`${decoder.decode(event.target.value)}`);
+
+      // ---------
+      // ATTENTION
+      // ---------
+      // Ici le code ne fonctionne pas comme il faudrait, l'application de scan confirme
+      // que la string est envoyé, mais pour le moment je n'arive pas à savoir ce que
+      // le code js en fait et comment la retrouver pour la traiter.
+
+    	document.getElementById('BLEinfoTX').innerHTML = `${decoder.decode(event.target.value)}`;
     };
 
 
