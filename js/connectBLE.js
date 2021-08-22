@@ -165,31 +165,6 @@
       // --------
       // DO SMTHG
       // --------
-
-      /* 
-      Structure des informations à envoyer 20bytes max ? 
-      Test jusqu'à 50 YEP
-      Test jusqu'à 200
-
-
-      L 0 J FF00FF - 10
-
-      - L = Couleur LED
-      - Numéro de la tuile concernée
-      - Quelle LEDs
-        A - 1000    2 - 3
-        B - 0100    |   |
-        C - 0010    1   4
-        D - 0001
-        E - 1100
-        F - 0110
-        G - 0011
-        H - 1110
-        I - 0111
-        J - 1111
-      - Couleur HEX
-      
-      */
       
     };
 
