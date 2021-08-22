@@ -1,5 +1,3 @@
-
-
 /*
 
     SCRIPT DE CONNECTION BLE
@@ -159,36 +157,44 @@
 
     const CharacteristicTXchanged = (event) => {
 
-
       const decoder = new TextDecoder('utf-8');
-      console.log(`New value was set = : ${decoder.decode(event.target.value)}`);
+      const TxReceived = `${decoder.decode(event.target.value)}`;
+      console.log(`New value was set = : ` + TxReceived );
+    	document.getElementById('BLEinfoTX').innerHTML = TxReceived;
 
-    	// console.log("New value was set = " + event.target.value.toString('utf8')); // +.getUint8(0)
-      alert(`${decoder.decode(event.target.value)}`);
+      // --------
+      // DO SMTHG
+      // --------
 
-      // ---------
-      // ATTENTION
-      // ---------
-      // Ici le code ne fonctionne pas comme il faudrait, l'application de scan confirme
-      // que la string est envoyé, mais pour le moment je n'arive pas à savoir ce que
-      // le code js en fait et comment la retrouver pour la traiter.
+      /* 
+      Structure des informations à envoyer 20bytes max
 
-    	document.getElementById('BLEinfoTX').innerHTML = `${decoder.decode(event.target.value)}`;
+      L 0 J FF00FF 000000 - 0 - 10
+
+      - L = Couleur LED
+      - Numéro de la tuile concernée
+      - Quelle LEDs
+        A - 1000    2 - 3
+        B - 0100    |   |
+        C - 0010    1   4
+        D - 0001
+        E - 1100
+        F - 0110
+        G - 0011
+        H - 1110
+        I - 0111
+        J - 1111
+      - Couleur HEX
+      
+      */
+      
     };
 
 
 // FONCTIONS POUR ECRIRE CHARACTERISTIQUE2 DEPUIS L'HTML
 
-    // function setBLEchar2( inputToPut ) {
-    //   if (characteristicRX == undefined) return; // console pas une erreur 
-    // 	characteristicRX.writeValue(inputToPut);
-    // };
-
-
-    function setBLEchar2( str ) {
-      // if (characteristicRX == undefined) return; // console pas une erreur 
-    	// const buffer = new Uint8Array(6);
-    	// buffer[0] = inputToPut;
+    function sendInfoViaRx( str ) {
+      if (characteristicRX == undefined) return; // console pas une erreur 
 
       const buffer = new Uint8Array(str.length);
       for (var i=0, strLen=str.length; i < strLen; i++) {
@@ -211,3 +217,10 @@
 
 
 
+
+// function setBLEchar2( inputToPut ) {
+  // const buffer = new Uint8Array(6);
+  // buffer[0] = inputToPut;
+//   if (characteristicRX == undefined) return; // console pas une erreur 
+// 	characteristicRX.writeValue(inputToPut);
+// };
