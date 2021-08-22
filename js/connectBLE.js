@@ -167,9 +167,12 @@
       // --------
 
       /* 
-      Structure des informations à envoyer 20bytes max
+      Structure des informations à envoyer 20bytes max ? 
+      Test jusqu'à 50 YEP
+      Test jusqu'à 200
 
-      L 0 J FF00FF 000000 - 0 - 10
+
+      L 0 J FF00FF - 10
 
       - L = Couleur LED
       - Numéro de la tuile concernée
