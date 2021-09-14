@@ -98,7 +98,6 @@
 
         // 2eme CHARACTERISTIQUE RX = ON ENVOI - WRITE 
         characteristicRX = await service.getCharacteristic('0512270a-0286-11ec-9a03-0242ac130003');
-
         };
 
 
@@ -172,7 +171,11 @@
 // FONCTIONS POUR ECRIRE CHARACTERISTIQUE2 DEPUIS L'HTML
 
     function sendInfoViaRx( str ) {
-      if (characteristicRX == undefined) return; // console pas une erreur 
+      console.log("sendInfoViaRx " + str);
+      if (characteristicRX == undefined) {
+        console.log("characteristicRX is undefined ");
+        return;
+      } // console pas une erreur 
 
       const buffer = new Uint8Array(str.length);
       for (var i=0, strLen=str.length; i < strLen; i++) {
@@ -192,13 +195,3 @@
 
 
 
-
-
-
-
-// function setBLEchar2( inputToPut ) {
-  // const buffer = new Uint8Array(6);
-  // buffer[0] = inputToPut;
-//   if (characteristicRX == undefined) return; // console pas une erreur 
-// 	characteristicRX.writeValue(inputToPut);
-// };
