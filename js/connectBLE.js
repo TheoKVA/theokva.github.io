@@ -86,18 +86,16 @@
         const service = await server.getPrimaryService('0512249e-0286-11ec-9a03-0242ac130003');
         console.log(service);
 
+        console.log(service.getCharacteristics());
 
         // 1ere CHARACTERISTIQUE TX = ON RECOIE - READ / NOTIFY
         characteristicTX = await service.getCharacteristic('051227fa-0286-11ec-9a03-0242ac130003');
         characteristicTX.startNotifications(); // Notifications
         characteristicTX.addEventListener('characteristicvaluechanged', CharacteristicTXchanged);
 
-        const readingTX = await characteristicTX.readValue();
-        console.log("characteristicTX value = " + decoder.decode(readingTX));
-        document.getElementById('BLEinfoTX').innerHTML = decoder.decode(readingTX);
+        // // 2eme CHARACTERISTIQUE RX = ON ENVOI - WRITE 
+        characteristicRX = await service.getCharacteristic('0512270a-0286-11ec-9a03-0242ac130003') 
 
-        // 2eme CHARACTERISTIQUE RX = ON ENVOI - WRITE 
-        characteristicRX = await service.getCharacteristic('0512270a-0286-11ec-9a03-0242ac130003');
         };
 
 
@@ -152,26 +150,49 @@
     }
 
 
+// ---------------------------------------------------
 // FONCTIONS POUR LIRE LES NOUVELLES CHARACTERISTIQUES
+// ---------------------------------------------------
 
     const CharacteristicTXchanged = (event) => {
 
       const decoder = new TextDecoder('utf-8');
       const TxReceived = `${decoder.decode(event.target.value)}`;
-      console.log(`New value was set = : ` + TxReceived );
+
+      console.log(`Message received: ` + TxReceived );
     	document.getElementById('BLEinfoTX').innerHTML = TxReceived;
 
       // --------
       // DO SMTHG
       // --------
+
+      const Infos = TxReceived.split("-");
+
+      switch(TxReceived.charAt(0)) {
+        case 'T': // new tile is set
+          console.log(`  > Tile ${Infos[1]} is now ${Infos[2]}`);
+          var randomColor = Math.floor(Math.random()*16777215).toString(16);
+
+          if( Infos[2]<253 ) {
+            sendInfoViaRx(`L-${Infos[1]}-15-${randomColor}-0`);
+          }
+          else {
+            sendInfoViaRx(`L-${Infos[1]}-15-000000-0`);
+          }
+          break;
+
+        default:
+          console.log('  > MESSAGE NOT UNDERSTOOD');
+      }
       
     };
 
-
-// FONCTIONS POUR ECRIRE CHARACTERISTIQUE2 DEPUIS L'HTML
+// -----------------------------------------------------
+// FONCTIONS POUR ECRIRE CHARACTERISTIQUES DEPUIS L'HTML
+// -----------------------------------------------------
 
     function sendInfoViaRx( str ) {
-      console.log("sendInfoViaRx " + str);
+      
       if (characteristicRX == undefined) {
         console.log("characteristicRX is undefined ");
         return;
@@ -182,11 +203,11 @@
         buffer[i] = str.charCodeAt(i);
       }
 
-    	try{ characteristicRX.writeValue(buffer) }
+    	// try{ characteristicRX.writeValueWithResponse(buffer) } // Renvoi la messg en réponse, pour s'assurer
+    	try{ characteristicRX.writeValueWithoutResponse(buffer) }
       catch(err){ alert(err); } ;
 
-      console.log("New value was set to = " + str);
-      console.log("Buffer = " + buffer);
+      console.log("Message sent: " + str);
     	document.getElementById('BLEinfoRX').innerHTML = str;
     };
 
