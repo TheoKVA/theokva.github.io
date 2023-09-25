@@ -1,0 +1,403 @@
+
+/* ==================== */
+/*   GLOBAL VARIABLES   */
+/* ==================== */
+
+:root {
+    --background-color: #fefae0;
+    --upload-section-color: #d9ab7d;
+    --calendar-section-color: #ccd5ae;
+    --bottom-section-color: #d4d1be;
+
+    --radius-ref: 300px;
+    --flex-gap: 7px;
+
+    /* [0,0] en haut à gauche */
+    --cross-X: 50;
+    --cross-X-plus: 0;
+    --cross-Y: 100;
+    --cross-Y-plus: 0;
+}
+
+*,
+*::before,
+*::after {
+    margin: 0;
+    padding: 0;
+    border: none;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Roboto', sans-serif;
+}
+
+
+
+
+/* ============= */
+/*   MAIN PAGE   */
+/* ============= */
+
+.page {
+    position: relative;
+    padding: 10px;
+    height: calc(100vh);
+    box-sizing: border-box; /* To make sure padding doesn't increase the overall width */
+    background-color: var(--background-color); 
+}
+
+#content-section {
+    height: 100%; 
+    max-width: 900px;
+    margin-left: auto;
+    margin-right: auto;
+
+    position: relative;
+    z-index: 0;
+
+    display: flex;
+    flex-direction: column;
+    gap: var(--flex-gap);
+}
+
+#info-button {
+    position: fixed ;
+    z-index: 1;
+    left: 0;
+    bottom: 0;
+    margin: 20px;
+    cursor: pointer;
+}
+#info-button .title-icon-bg {
+    box-shadow: rgba(149, 157, 165, 0.15) 0px 8px 24px;
+}
+
+
+
+
+/* =============== */
+/*   TOP SECTION   */
+/* =============== */
+
+#top-section {
+    flex: 1; /* Takes up all available space in its parent */
+    display: flex;
+    justify-content: space-between;
+    gap: var(--flex-gap);
+    width: 100%;
+}
+
+
+
+
+/* ================== */
+/*   UPLOAD SECTION   */
+/* ================== */
+
+#upload-section {
+    position: relative;
+    width: calc( (var(--cross-X) + var(--cross-X-plus)) * 1%);
+    overflow-y: auto; /* Allows vertical scrolling if content overflows */
+    overflow-x: auto; /* Allows horizontal scrolling if content overflows */
+
+    border-radius: var(--radius-ref);
+    border-top-left-radius: 0px;
+    background-color: var(--upload-section-color);
+}
+
+/* TITLE AND CONTENT */
+#upload-section-title {
+    background-color: var(--upload-section-color);
+    cursor: pointer;
+}
+
+
+
+
+/* ==================== */
+/*   CALENDAR SECTION   */
+/* ==================== */
+
+#calendar-section {
+    position: relative;
+    flex: 1;
+    overflow-y: auto; /* Allows vertical scrolling if content overflows */
+    overflow-x: hidden; /* Allows horizontal scrolling if content overflows */
+    
+    border-radius: var(--radius-ref);
+    border-bottom-right-radius: 0px;
+
+    background-color: var(--calendar-section-color);
+}
+#calendar-section-title {
+    background-color: var(--calendar-section-color);
+}
+
+#calendar-section-content {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+
+    padding-top: 70px;
+    padding-right: 30px;
+    padding-left: 30px;
+    padding-bottom: 80px;
+}
+
+/* DROPDOWN */
+#nameDropdown {
+    height: 30px;
+    width: 60%;
+    border-radius: 5px;
+    margin-left: auto;
+    margin-right: auto;
+    border: 1px solid rgba(46, 46, 46, 0.5);
+
+    font-size: 15px;
+    font-weight: 500;
+    padding-left: 10px;
+}
+
+/* TABLE */
+#calendar-planningTable {
+    overflow-y: auto;
+    overflow-x: auto;
+}
+#planningTable tr {
+    font-size: 22px;
+    border-top: 2px solid rgba(0, 0, 0, 0.696) !important;
+}
+
+/* INPUTS */
+#planningTable input {
+    font-size: 18px;
+    background-color: transparent;
+    padding-top: 3px;
+    padding-bottom: 3px;
+}
+#planningTable tr td:nth-child(1),
+#planningTable tr td:nth-child(2) input,
+#planningTable tr td:nth-child(3) input {
+    text-align: center;
+}
+#planningTable tr td:nth-child(2) input {
+    width: 90px;
+}
+#planningTable tr td:nth-child(3) input {
+    width: 130px;
+}
+#planningTable tr td:nth-child(4) input,
+#planningTable tr td:nth-child(5) input {
+    padding-left: 5px;
+}
+
+/* TABLE SCROLLBAR */
+#calendar-planningTable::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+#calendar-planningTable::-webkit-scrollbar-track {
+    background: transparent;
+    border-top: 5px solid transparent; 
+}
+#calendar-planningTable::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.5);
+    border-radius: 6px;
+    border-top: 5px solid transparent;
+}
+
+/* DOWNLOAD BUTTON */
+#generateButton {
+    height: 40px;
+    width: auto;
+    border-radius: 15px;
+
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 15px;
+    padding-right: 15px;
+    
+    background-color: rgb(255, 255, 255);
+    font-size: 22px;
+    font-weight: 600;
+    white-space: nowrap;
+
+    cursor: pointer;
+}
+
+
+
+
+/* ============== */
+/*     TITLES     */
+/* ============== */
+
+
+.overlay-title-div {
+    display: flex; 
+    flex-direction: column;
+    gap: 12px;
+    align-items: center;
+    justify-content: center;
+}
+#bottom-section-title {
+    flex-direction: row;
+    gap: 8px;
+}
+.title-text {
+    font-size: 30px;
+    line-height: 32px;
+    font-weight: 600;
+    text-align: center;
+    white-space: nowrap;
+}
+#bottom-section-title .title-text {
+    text-align: left;
+}
+
+.title-icon {
+    position: relative;
+    height: 80px;
+    width: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.title-icon-picto {
+    position: relative;
+    z-index: 1;
+    width: 45px;
+    height: auto;
+    display: block;   
+}
+
+.title-icon-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgb(255, 255, 255);
+    border-radius: 50px;
+    z-index: -1;
+}
+#upload-section-title .title-icon-bg {
+    border-top-left-radius: 0px;
+}
+#calendar-section-title .title-icon-bg {
+    border-bottom-right-radius: 0px;
+}
+
+
+
+
+/* ================== */
+/*   BOTTOM SECTION   */
+/* ================== */
+
+#bottom-section {
+    height: calc( (100 - (var(--cross-Y) + var(--cross-Y-plus))) * 1%);
+
+    position: relative;
+    overflow-y: hidden;
+
+    border-radius: 150px;
+    background-color: var(--bottom-section-color);
+}
+
+/* CONTENT */
+#bottom-section-content {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 50px;
+
+    padding-top: 120px;
+    padding-right: 100px;
+    padding-left: 100px;
+    padding-bottom: 150px;
+}
+.bottom-section-content-paragraph {
+    display: flex; 
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 0;
+}
+.bottom-section-content-paragraph h2 {
+    font-size: 25px;
+    line-height: 30px;
+    font-weight: 600;
+}
+.bottom-section-content-paragraph p {
+    font-size: 22px;
+    line-height: 28px;
+    font-weight: 400;
+    padding-left: 30px;
+}
+
+/* CLOSE BTN */
+#bottom-section-close-btn {
+    position: sticky;
+    z-index: 2;
+    top: 80px;
+    left: calc(100% - 100px);
+    cursor: pointer;
+    user-select: none;
+
+    font-size: 50px;
+    font-weight: 200;
+    background-color: transparent;
+    
+    color: black;
+}
+#bottom-section-close-btn:hover {
+    color: gray;
+}
+
+
+
+
+/* ============= */
+/*    GENERALE   */
+/* ============= */
+
+/* TITLE AND CONTENT */
+.overlay-title-div {
+    position: absolute;
+    z-index: 3;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    user-select: none;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+
+    /* ANIMATION */
+    visibility: visible;
+    opacity: 100%;
+}
+.bottom-content-div {
+    position: absolute;
+    z-index: 1;
+    top: 0;
+    left: 0;
+}
+
+/* SCROLLBARS */
+#upload-section::-webkit-scrollbar, 
+#calendar-section::-webkit-scrollbar,
+#bottom-section::-webkit-scrollbar {
+    width: 0px;
+    height: 0px;
+}
+#upload-section,
+#calendar-section, 
+#bottom-section {
+    scrollbar-width: none;
+}
