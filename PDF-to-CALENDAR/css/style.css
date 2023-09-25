@@ -51,11 +51,6 @@ body {
     overflow-y: hidden;
 }
 
-/* .full-page{
-    min-width: 800px;
-    transition: transform 0.5s ease;
-} */
-
 #content-section {
     height: 100%; 
     max-width: 900px;
@@ -364,6 +359,7 @@ body {
 }
 
 /* CLOSE BTN */
+#calendar-section-close-btn,
 #bottom-section-close-btn {
     position: sticky;
     z-index: 2;
@@ -376,6 +372,16 @@ body {
     font-weight: 200;
     background-color: transparent;
     
+    color: black;
+}
+#calendar-section-close-btn {
+    top:10px;
+    left:50%;
+    opacity: 50%;
+    font-size: 40px;
+    color: gray;
+}
+#calendar-section-close-btn:hover{
     color: black;
 }
 #bottom-section-close-btn:hover {
@@ -447,7 +453,7 @@ body {
     }
     #bottom-section-close-btn {
         top: 10px;
-        left: calc(50% - 0px);
+        left: 50%;
     }
 }
 

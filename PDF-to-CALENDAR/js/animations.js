@@ -114,6 +114,7 @@ uploadSection.addEventListener('click', function() {
 
 const uploadSectionTitle = document.getElementById("upload-section-title");
 const calendarSectionTitle = document.getElementById("calendar-section-title");
+const calendarSectionClose = document.getElementById("calendar-section-close-btn");
 let calendarSectionIsOpen = false
 
 function getReadyForCalendar() {
@@ -155,13 +156,43 @@ function getReadyForCalendar() {
     // On prépare la section calendar
     gsap.to(":root", {
         "--cross-X": 0,
-        "--radius-ref": '150px',
+        "--radius-ref": '100px',
         duration: 1.2,
         ease: "power2.inOut"
     });
 
     calendarSectionIsOpen = true;
 }
+
+calendarSectionClose.addEventListener("click", function() {
+
+    uploadSectionTitle.style.visibility = "visible";
+    calendarSectionTitle.style.visibility = "visible";
+    uploadSection.style.visibility = "visible";
+
+    // On fait apparaitre uploadSectionTitle
+    gsap.to(uploadSectionTitle,{
+        opacity: "100%",
+        duration: 0.3
+    });
+
+    // On fait apparaitre calendarSectionTitle
+    gsap.to(calendarSectionTitle,{
+        opacity: "100%",
+        duration: 0.3
+    });
+
+    // On prépare la section calendar
+    gsap.to(":root", {
+        "--cross-X": 50,
+        "--radius-ref": '300px',
+        duration: 1.2,
+        ease: "power2.inOut"
+    });
+
+    calendarSectionIsOpen = false
+
+});
 
 
 
