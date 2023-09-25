@@ -9,7 +9,7 @@ gsap.to(":root", {
     duration: 1.2,
     ease: "power2.inOut"
 });
-
+ 
 // ===================
 //   MOBILE FIRENDLY
 // ===================
@@ -20,7 +20,7 @@ gsap.to(":root", {
 window.addEventListener('resize', checkWidth);
 function checkWidth() {
   const div = document.body;
-  const minWidth = 500;
+  const minWidth = 550;
   const windowWidth = window.innerWidth;
 
   if (windowWidth < minWidth) {
@@ -224,6 +224,7 @@ infoButton.addEventListener("click", function() {
     const foldDirection = getComputedStyle(document.documentElement).getPropertyValue('--fold-direction').trim();
     gsap.to(":root", {
         "--cross-Y": foldDirection=='column'? 30 : 40,
+        "--title-gap": foldDirection=='column'? 12 : 2,
         duration: 0.8,
         ease: "power2.easeOut"
     });
@@ -238,6 +239,7 @@ bottomSectionClose.addEventListener("click", function() {
 
     gsap.to(":root", {
         "--cross-Y": 100,
+        "--title-gap": 12,
         duration: 0.8,
         ease: "power2.easeOut",
         onComplete: function() {

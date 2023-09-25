@@ -11,6 +11,7 @@
 
     --radius-ref: 300px;
     --flex-gap: 7px;
+    --title-gap: 12px;
 
     /* [0,0] en haut à gauche */
     --cross-X: 50;
@@ -103,8 +104,8 @@ body {
 #upload-section {
     position: relative;
     width: calc( (var(--cross-X) + var(--cross-X-plus)) * 1%);
-    overflow-y: auto; /* Allows vertical scrolling if content overflows */
-    overflow-x: auto; /* Allows horizontal scrolling if content overflows */
+    overflow-y: auto;
+    overflow-x: auto;
 
     border-radius: var(--radius-ref);
     border-top-left-radius: 0px;
@@ -127,12 +128,11 @@ body {
 #calendar-section {
     position: relative;
     flex: 1;
-    overflow-y: auto; /* Allows vertical scrolling if content overflows */
-    overflow-x: hidden; /* Allows horizontal scrolling if content overflows */
+    overflow-y: auto;
+    overflow-x: hidden;
     
     border-radius: var(--radius-ref);
     border-bottom-right-radius: 0px;
-
     background-color: var(--calendar-section-color);
 }
 #calendar-section-title {
@@ -260,7 +260,7 @@ body {
 .overlay-title-div {
     display: flex; 
     flex-direction: column;
-    gap: 12px;
+    gap: var(--title-gap);
     align-items: center;
     justify-content: center;
 }
@@ -442,7 +442,7 @@ body {
 /*    MOBILES   */
 /* ============ */
 
-@media only screen {
+@media only screen and (max-width: 700px) {
     :root {
         --fold-direction: 'column';
     }
