@@ -564,6 +564,7 @@ function generateICSEvents() {
 
     const targetName = document.getElementById('nameDropdown').value;
     ics.download(`Calendar_for_${targetName}`);
+    
 }
 
 
