@@ -10,6 +10,32 @@ gsap.to(":root", {
     ease: "power2.inOut"
 });
 
+// ===================
+//   MOBILE FIRENDLY
+// ===================
+/*
+    On scale en cas de plus petit qu'une certaine largeur
+*/
+
+window.addEventListener('resize', checkWidth);
+
+function checkWidth() {
+  const div = document.body;
+  const minWidth = 500;
+  const windowWidth = window.innerWidth;
+
+  if (windowWidth < minWidth) {
+    const scale = windowWidth / minWidth;
+    div.style.transform = `scale(${scale})`;
+    div.style.width = `${100/scale}%`;
+    div.style.height = `calc(${100/scale}vh)`; 
+  } else {
+    div.style.transform = 'scale(1)';
+    div.style.width = '100%';
+    div.style.height = 'calc(100vh)'; 
+  }
+}
+checkWidth();
 
 
 

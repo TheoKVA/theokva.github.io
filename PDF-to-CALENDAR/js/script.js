@@ -109,6 +109,7 @@ const equipeNom = [
     'FESSLER',
     'GARCIA',
     'WILMOT',
+    'CROSTA-BLANCO',
 ]
 
 const equipeNomBis = [
@@ -144,7 +145,8 @@ const equipeNomBis = [
     'FESSLER Thomas',
     'GARCIA Andrea',
     // 'HUG Sylvie',
-    'WILMOT Hector'
+    'WILMOT Hector',
+    'CROSTA-BLANCO Emiliano'
 ]
 
 let equipePlanning = equipeNom.map((nom, index) => {

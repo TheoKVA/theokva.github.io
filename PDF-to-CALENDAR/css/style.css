@@ -31,7 +31,7 @@
 body {
     font-family: 'Roboto', sans-serif;
 }
-
+  
 
 
 
@@ -40,12 +40,20 @@ body {
 /* ============= */
 
 .page {
+    transform: scale(1);
+    transform-origin: 0 0;
+
     position: relative;
     padding: 10px;
     height: calc(100vh);
     box-sizing: border-box; /* To make sure padding doesn't increase the overall width */
     background-color: var(--background-color); 
 }
+
+/* .full-page{
+    min-width: 800px;
+    transition: transform 0.5s ease;
+} */
 
 #content-section {
     height: 100%; 
