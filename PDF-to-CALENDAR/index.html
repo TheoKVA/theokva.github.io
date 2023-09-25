@@ -63,8 +63,12 @@
                 </div>
 
                 <div id="calendar-section-content" class="bottom-content-div">
+
                     <select id="nameDropdown"></select>
-                    <div id="calendar-planningTable">
+
+                    <p id='calendar-error' style="display:none">Pas de planification détéctée, upload plus de PDF d'un coup si besoin.</p>
+
+                    <div id="calendar-planningTable" style="display:none">
                         <table id="planningTable">
                             <thead>
                                 <tr>
@@ -80,7 +84,8 @@
                             </tbody>
                         </table>
                     </div>
-                    <button id="generateButton">Générer le Calendrier</button>
+
+                    <button id="generateButton" disabled>Générer le Calendrier</button>
                 </div>
 
             </div>

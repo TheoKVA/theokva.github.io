@@ -21,7 +21,7 @@ window.addEventListener('resize', checkWidth);
 
 function checkWidth() {
   const div = document.body;
-  const minWidth = 500;
+  const minWidth = 550;
   const windowWidth = window.innerWidth;
 
   if (windowWidth < minWidth) {
@@ -100,7 +100,7 @@ window.addEventListener("drop", function(e) {
         // Construct an event object and call the handler
         const evt = { target: fileInput };
         handleFileUpload(evt);
-        getReadyForCalendar();
+        // getReadyForCalendar(); // Pas ici, quand on a loadé
     }
 
 });
@@ -109,7 +109,7 @@ window.addEventListener("drop", function(e) {
 uploadSection.addEventListener('click', function() {
     fileInput.click();
     if (bottomSectionIsOpen) bottomSectionClose.click();
-    getReadyForCalendar();
+    // getReadyForCalendar();
 });
 
 const uploadSectionTitle = document.getElementById("upload-section-title");
@@ -117,6 +117,9 @@ const calendarSectionTitle = document.getElementById("calendar-section-title");
 let calendarSectionIsOpen = false
 
 function getReadyForCalendar() {
+
+    // On coupe si déjà ouvert
+    if(calendarSectionIsOpen) return
 
     // On fait disparaitre uploadSectionTitle
     gsap.fromTo(uploadSectionTitle,{

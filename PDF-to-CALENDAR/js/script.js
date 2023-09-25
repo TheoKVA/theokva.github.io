@@ -9,10 +9,6 @@ fileInput.addEventListener('change', handleFileUpload);
 // Gère l'action
 async function handleFileUpload(event) {
 
-    // Active les éléments
-    // document.getElementById("nameDropdown").disabled = false
-    // document.getElementById("generateButton").disabled = false
-
     const files = event.target.files;
     const promises = [];
 
@@ -49,6 +45,7 @@ function loadPDF(pdfData, fileName) {
     
     loadingTask.promise.then(pdf => {
         console.log('PDF loaded');
+        getReadyForCalendar();
     
         const pagePromises = Array.from({ length: pdf.numPages }, (_, i) => i + 1)
             .map(pageNum => {
@@ -110,6 +107,7 @@ const equipeNom = [
     'GARCIA',
     'WILMOT',
     'CROSTA-BLANCO',
+    'HUG'
 ]
 
 const equipeNomBis = [
@@ -266,8 +264,6 @@ function extractPlannification(textContent, fileName) {
         // console.log(table_raw_bis);
 
 
-
-        
         // ========= PROCESS DATA =========
 
         // Inialise l'array qui va contenir toutes les planifications de tout le monde
@@ -432,6 +428,19 @@ document.getElementById('nameDropdown').addEventListener('change', function() {
         return;
     }
 
+    console.log(personnePlanning);
+    if( personnePlanning.planification.length == 0 ) {
+        console.log('Empty plannification');
+        document.getElementById('calendar-planningTable').style.display = 'none';
+        document.getElementById('calendar-error').style.display = 'inline-block';
+        document.getElementById('generateButton').disabled = true;
+        return
+    }
+
+    document.getElementById('calendar-planningTable').style.display = 'inline-block';
+    document.getElementById('calendar-error').style.display = 'none';
+    document.getElementById('generateButton').disabled = false;
+
     const tableBody = document.querySelector('#planningTable tbody');
     tableBody.innerHTML = ''; // Clear any existing rows
 
@@ -439,28 +448,29 @@ document.getElementById('nameDropdown').addEventListener('change', function() {
     personnePlanning.planification.forEach(plan => {
         plan.horraires.forEach(horraire => {
 
-            // skip this iteration and proceed to the next one
-            // if (plan.raw.toLowerCase().includes('jour de repos') || 
-            //     plan.raw.toLowerCase().includes('maladie') || 
-            //     plan.raw.toLowerCase().includes('jour sans travail')
-            // ) { return }
-
-
             const row = document.createElement('tr');
 
             // --- Checkbox column ---
             const checkboxTd = document.createElement('td');
+            const label = document.createElement('label');
+            label.className = 'switch';
             const checkbox = document.createElement('input');
             checkbox.type = 'checkbox';
             checkbox.checked = true;
-            checkboxTd.appendChild(checkbox);
+            const span = document.createElement('span');
+            span.className = 'slider round';
+            label.appendChild(checkbox);
+            label.appendChild(span);
+            checkboxTd.appendChild(label);
             row.appendChild(checkboxTd);
 
             // --- Date column ---
             const dateTd = document.createElement('td');
             const dateInput = document.createElement('input');
             dateInput.type = 'text';
-            dateInput.value = `${plan.date.getDate()}.${plan.date.getMonth() + 1}.${plan.date.getFullYear().toString().slice(-2)}`;
+            const weekdays = ['Dim.', 'Lun.', 'Mar.', 'Mer.', 'Jeu.', 'Ven.', 'Sam.'];
+            const dayOfWeek = weekdays[plan.date.getDay()];
+            dateInput.value = `${dayOfWeek} ${plan.date.getDate()}.${plan.date.getMonth() + 1}.${plan.date.getFullYear().toString().slice(-2)}`;
             dateTd.appendChild(dateInput);
             row.appendChild(dateTd);
 
@@ -517,7 +527,6 @@ document.getElementById('nameDropdown').addEventListener('change', function() {
 
 
 // DOM - Interraction du bouton
-// document.getElementById("generateButton").addEventListener("click", () => { generateCalendar(dropdown.value) });
 document.getElementById("generateButton").addEventListener("click", generateICSEvents);
 
 // À partir de la selection on sort le .ICS
@@ -525,9 +534,11 @@ function generateICSEvents() {
     const ics = window.ics();
 
     document.querySelectorAll('#planningTable tbody tr').forEach(row => {
+
         const isChecked = row.querySelector('input[type="checkbox"]').checked;
+
         if (isChecked) {
-            const dateValue = row.children[1].querySelector('input').value.split('.');
+            const dateValue = row.children[1].querySelector('input').value.split(' ')[1].split('.');
             const hourValue = row.children[2].querySelector('input').value;
             const nameValue = row.children[3].querySelector('input').value;
             const rawValue = row.children[4].querySelector('input').value;
@@ -570,75 +581,3 @@ function cleanString(str) {
     return str.split(' ').filter(Boolean).join(' ');
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-// function handleFileUpload(event) {
-
-//     const file = event.target.files[0];
-//     if (file) {
-//         const reader = new FileReader();
-//         reader.onload = function(evt) {
-//             const typedarray = new Uint8Array(evt.target.result);
-//             loadPDF(typedarray, file.name);
-//         };
-//         reader.readAsArrayBuffer(file);
-//     }
-
-// }
-
-
-
-// function generateCalendar(targetName) {
-
-//     // LOG
-//     // console.log('generateCalendar of '+ targetName);
-
-//     // On déduit la bonne personne depuis le dropdown
-//     const personnePlanning = equipePlanning.find(e => e.nomBis === targetName);
-//     if (!personnePlanning) {
-//         console.error(`No equipe found for ${data.nom}`);
-//         return;
-//     }
-
-//     // LOG
-//     console.log(personnePlanning);
-
-//     // Initialize the ics object
-//     const ics = window.ics();
-
-//     personnePlanning.planification.forEach(plan => {
-//         // Iterate over horraires and create an event for each
-//         plan.horraires.forEach(horraire => {
-//             const [startHour, startMin] = horraire.split('-')[0].split('h');
-//             const [endHour, endMin] = horraire.split('-')[1].split('h');
-
-//             const startDate = new Date(plan.date);
-//             startDate.setHours(Number(startHour), Number(startMin));
-
-//             const endDate = new Date(plan.date);
-//             endDate.setHours(Number(endHour), Number(endMin));
-
-//             ics.addEvent(
-//                 plan.nom, // Event title
-//                 plan.raw, // Description
-//                 '', // Location
-//                 startDate, // Start time
-//                 endDate // End time
-//             );
-//         });
-//     });
-
-//     // Lance le download du ICS
-//     ics.download(`Calendar_of_${personnePlanning.nomBis}`);
-
-// }

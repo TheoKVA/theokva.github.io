@@ -47,7 +47,8 @@ body {
     padding: 10px;
     height: calc(100vh);
     box-sizing: border-box; /* To make sure padding doesn't increase the overall width */
-    background-color: var(--background-color); 
+    background-color: var(--background-color);
+    overflow-y: hidden;
 }
 
 /* .full-page{
@@ -168,14 +169,26 @@ body {
     padding-left: 10px;
 }
 
+/* MESSAGE D'ERREUR */
+#calendar-error {
+    font-size: 20px;
+    line-height: 25px;
+    font-weight: 500;
+    text-align: center;
+}
+
 /* TABLE */
 #calendar-planningTable {
     overflow-y: auto;
     overflow-x: auto;
 }
-#planningTable tr {
+#calendar-planningTable table {
+    border-collapse: collapse;
+}
+#planningTable td {
+    height: 35px;
     font-size: 22px;
-    border-top: 2px solid rgba(0, 0, 0, 0.696) !important;
+    border-top: 1px solid rgba(0, 0, 0, 0.696);
 }
 
 /* INPUTS */
@@ -190,15 +203,20 @@ body {
 #planningTable tr td:nth-child(3) input {
     text-align: center;
 }
+#planningTable tr td:nth-child(1) > label {
+    margin-top: 7px;
+}
 #planningTable tr td:nth-child(2) input {
-    width: 90px;
+    margin-left: 5px;
+    width: 130px;
 }
 #planningTable tr td:nth-child(3) input {
-    width: 130px;
+    width: 120px;
 }
 #planningTable tr td:nth-child(4) input,
 #planningTable tr td:nth-child(5) input {
     padding-left: 5px;
+    margin-left: 5px;
 }
 
 /* TABLE SCROLLBAR */
@@ -255,8 +273,8 @@ body {
     gap: 8px;
 }
 .title-text {
-    font-size: 30px;
-    line-height: 32px;
+    font-size: 35px;
+    line-height: 40px;
     font-weight: 600;
     text-align: center;
     white-space: nowrap;
@@ -408,4 +426,100 @@ body {
 #calendar-section, 
 #bottom-section {
     scrollbar-width: none;
+}
+
+
+
+
+/* ============ */
+/*    MOBILES   */
+/* ============ */
+
+@media only screen {
+    .page {
+        padding: 20px;
+    }
+    #bottom-section-content {    
+        padding-top: 80px;
+        padding-right: 60px;
+        padding-left: 60px;
+        padding-bottom: 100px;
+    }
+    #bottom-section-close-btn {
+        top: 10px;
+        left: calc(50% - 0px);
+    }
+}
+
+
+
+
+
+
+
+
+
+
+:root {
+    --switch-width: 35px;
+    --switch-height: 19px;
+    --switch-padding: 3px;
+    --switch-color-on: #7c9137;
+    --switch-color-off: #afac9a;
+    --switch-color-toggle: white;
+}
+
+/* Hide default HTML checkbox */
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+/* The switch - the box around the slider */
+.switch {
+    position: relative;
+    display: inline-block;
+    width: var(--switch-width);
+    height: var(--switch-height);
+}
+/* The slider */
+.slider {
+    position: absolute;
+    cursor: pointer;
+    inset: 0;
+    background-color: var(--switch-color-off);
+    -webkit-transition: .4s;
+    transition: .4s;
+}
+.slider:before {
+    position: absolute;
+    content: "";
+    height: calc( var(--switch-height) - (2 * var(--switch-padding)) );
+    width: calc( var(--switch-height) - (2 * var(--switch-padding)) );
+    left: var(--switch-padding);
+    bottom: var(--switch-padding);
+    background-color: var(--switch-color-toggle);
+    -webkit-transition: .4s;
+    transition: .4s;
+}
+
+input:checked + .slider {
+    background-color: var(--switch-color-on);
+}
+input:focus + .slider {
+    box-shadow: 0 0 1px var(--switch-color-on);
+}
+
+input:checked + .slider:before {
+    -webkit-transform: translateX( calc( var(--switch-width) - var(--switch-height)) );
+    -ms-transform: translateX( calc( var(--switch-width) - var(--switch-height)) );
+    transform: translateX( calc( var(--switch-width) - var(--switch-height)) );
+}
+
+/* Rounded sliders */
+.slider.round {
+    border-radius: calc( var(--switch-height)/2 );
+}
+.slider.round:before {
+    border-radius: 50%;
 }
