@@ -1,0 +1,218 @@
+/*
+
+    SCRIPT DE CONNECTION BLE
+
+    Ce script est la base de la connection avec la board.
+    La board et le script du game se connectent via le protocole BLE.
+
+    Les avantages de la connection BLE sont : une connection stable
+                                              une connection non-constante
+                                              un passage d'informations bi-directionnelles
+
+*/
+
+
+
+// --- ---------------- ---
+// --- STRUCTURE DU BLE ---
+// --- ---------------- ---
+    /* 
+
+    - STRUCTURE DES INFORMATION -
+
+      CENTRAL ───Read/Write/GetNotify───> PERIPHERAL
+    (Computer)      │                     (Arduino)
+                    │
+                    ├─> READ : ask the peripheral to send back the current value of the characteristic
+                    ├─> WRITE : modify the value of the characteristic
+                    └─> INDICATE / NOTIFY : ask to continuously send updated values of the characteristic
+
+
+    - STRUCTURE DES SERVICES - 
+
+        BLE Peripheral
+         └─> SERVICE
+                └─> CHARACTERISTICS
+
+
+            SERVICE
+            Can be defined or use standard.
+                └─> DEFINED : 128-bit UUID
+                └─> STANDARD : 16-bit UUID
+
+                    CHARACTERISTICS
+                        └─> UP TO 512-bit
+                        └─> STANDARD : 16-bit UUID
+   
+    */
+
+
+// --- ----------------- ---
+// --- VARIABLES LOCALES ---
+// --- ----------------- ---
+
+    // VARIABLES  GENERALES
+
+        var bluetoothDevice = null ;
+        var characteristicTX, characteristicRX; // Déclare les variables pour un acces ulterieur
+
+        const decoder = new TextDecoder('utf-8'); // Decodeur pour pouvoir lire les strings
+
+
+// --- ----------------------- ---
+// --- FONCTION DE CONNECTIONS ---
+// --- ----------------------- ---
+
+    // connectBLE() - CONNECTION À LA BOARD 
+
+        const connectBLE = async () => {
+        bluetoothDevice = null;
+        bluetoothDevice = await navigator.bluetooth
+                	    .requestDevice({
+                	    		acceptAllDevices: false,
+                	    		filters: [
+                				    {name: 'PROTOBOARD V1',} // Spécifie le nom pour filter les appareils
+                				],
+                	    		optionalServices: ['0512249e-0286-11ec-9a03-0242ac130003'] // Annonce le nom du service visé
+                	    	})
+                        .catch(error => { console.error(error); });
+        console.log("Bluetooth Device connected : " + bluetoothDevice.name); // LOG de Connexion
+        setBLEstatut("Connected");
+
+        bluetoothDevice.addEventListener('gattserverdisconnected', ifDisconnected); // en cas de déconnexion
+        const server = await bluetoothDevice.gatt.connect();
+        console.log(server);
+
+        const service = await server.getPrimaryService('0512249e-0286-11ec-9a03-0242ac130003');
+        console.log(service);
+
+        console.log(service.getCharacteristics());
+
+        // 1ere CHARACTERISTIQUE TX = ON RECOIE - READ / NOTIFY
+        characteristicTX = await service.getCharacteristic('051227fa-0286-11ec-9a03-0242ac130003');
+        characteristicTX.startNotifications(); // Notifications
+        characteristicTX.addEventListener('characteristicvaluechanged', CharacteristicTXchanged);
+
+        // // 2eme CHARACTERISTIQUE RX = ON ENVOI - WRITE 
+        characteristicRX = await service.getCharacteristic('0512270a-0286-11ec-9a03-0242ac130003') 
+
+        };
+
+
+    // disconnectBLE() - DECONNECTION DE LA BOARD 
+
+        function disconnectBLE() {
+          if (!bluetoothDevice) {
+            return;
+          }
+          console.log('Disconnecting from Bluetooth Device.');
+          if (bluetoothDevice.gatt.connected) {
+            bluetoothDevice.gatt.disconnect();
+            setBLEstatut("Disconnected");
+          } else {
+            console.log('> Bluetooth Device is already disconnected.');
+          }
+        }
+
+        // ALERTE DE DECONNEXION
+
+            function ifDisconnected(event) {
+              // Object event.target is Bluetooth Device getting disconnected.
+              alert('Bluetooth Device is disconnected');
+              setBLEstatut("Disconnected");
+            }
+
+
+    // reconnectBLE() - RECONNECT À LA BOARD PERDUE
+
+        function reconnectBLE() { // retrieve values
+          if (!bluetoothDevice) {
+            return;
+          }
+          if (bluetoothDevice.gatt.connected) {
+            console.log('> Bluetooth Device is already connected');
+            return;
+          }
+          bluetoothDevice.gatt.connect()
+                              .then(server => {
+                            	console.log("Bluetooth Device connected : " + bluetoothDevice.name);
+                                setBLEstatut("Connected");
+                                })
+                              .catch(error => { console.error(error); });
+        }
+
+
+
+// FONCTION POUR LOG LE STATUT
+
+    function setBLEstatut(statut) {
+      document.getElementById('BLEstatut').innerHTML = statut;
+    }
+
+
+// ---------------------------------------------------
+// FONCTIONS POUR LIRE LES NOUVELLES CHARACTERISTIQUES
+// ---------------------------------------------------
+
+    const CharacteristicTXchanged = (event) => {
+
+      const decoder = new TextDecoder('utf-8');
+      const TxReceived = `${decoder.decode(event.target.value)}`;
+
+      console.log(`Message received: ` + TxReceived );
+    	document.getElementById('BLEinfoTX').innerHTML = TxReceived;
+
+      // --------
+      // DO SMTHG
+      // --------
+
+      const Infos = TxReceived.split("-");
+
+      switch(TxReceived.charAt(0)) {
+        case 'T': // new tile is set
+          console.log(`  > Tile ${Infos[1]} is now ${Infos[2]}`);
+          var randomColor = Math.floor(Math.random()*16777215).toString(16);
+
+          if( Infos[2]<253 ) {
+            sendInfoViaRx(`L-${Infos[1]}-15-${randomColor}-0`);
+          }
+          else {
+            sendInfoViaRx(`L-${Infos[1]}-15-000000-0`);
+          }
+          break;
+
+        default:
+          console.log('  > MESSAGE NOT UNDERSTOOD');
+      }
+      
+    };
+
+// -----------------------------------------------------
+// FONCTIONS POUR ECRIRE CHARACTERISTIQUES DEPUIS L'HTML
+// -----------------------------------------------------
+
+    function sendInfoViaRx( str ) {
+      
+      if (characteristicRX == undefined) {
+        console.log("characteristicRX is undefined ");
+        return;
+      } // console pas une erreur 
+
+      const buffer = new Uint8Array(str.length);
+      for (var i=0, strLen=str.length; i < strLen; i++) {
+        buffer[i] = str.charCodeAt(i);
+      }
+
+    	// try{ characteristicRX.writeValueWithResponse(buffer) } // Renvoi la messg en réponse, pour s'assurer
+    	try{ characteristicRX.writeValueWithoutResponse(buffer) }
+      catch(err){ alert(err); } ;
+
+      console.log("Message sent: " + str);
+    	document.getElementById('BLEinfoRX').innerHTML = str;
+    };
+
+
+
+
+
+
