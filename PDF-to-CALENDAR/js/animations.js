@@ -18,10 +18,9 @@ gsap.to(":root", {
 */
 
 window.addEventListener('resize', checkWidth);
-
 function checkWidth() {
   const div = document.body;
-  const minWidth = 550;
+  const minWidth = 500;
   const windowWidth = window.innerWidth;
 
   if (windowWidth < minWidth) {
@@ -163,8 +162,11 @@ function getReadyForCalendar() {
 
     calendarSectionIsOpen = true;
 }
-
 calendarSectionClose.addEventListener("click", function() {
+
+    // On vide le tableau
+    const tableBody = document.querySelector('#planningTable tbody');
+    tableBody.innerHTML = ''; // Clear any existing rows
 
     uploadSectionTitle.style.visibility = "visible";
     calendarSectionTitle.style.visibility = "visible";
@@ -219,8 +221,9 @@ infoButton.addEventListener("click", function() {
     // Active le scroll
     bottomSection.style.overflowY = "auto";
 
+    const foldDirection = getComputedStyle(document.documentElement).getPropertyValue('--fold-direction').trim();
     gsap.to(":root", {
-        "--cross-Y": 30,
+        "--cross-Y": foldDirection=='column'? 30 : 40,
         duration: 0.8,
         ease: "power2.easeOut"
     });

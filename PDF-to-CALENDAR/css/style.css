@@ -17,6 +17,7 @@
     --cross-X-plus: 0;
     --cross-Y: 100;
     --cross-Y-plus: 0;
+    --fold-direction: 'row';
 }
 
 *,
@@ -442,13 +443,26 @@ body {
 /* ============ */
 
 @media only screen {
+    :root {
+        --fold-direction: 'column';
+    }
     .page {
         padding: 20px;
     }
+    #top-section{
+        flex-direction: column;
+    }
+    #upload-section{
+        width:100%;
+        height: calc( (var(--cross-X) + var(--cross-X-plus)) * 1%)
+    }
+    #calendar-section {
+        width:100%;
+    }
     #bottom-section-content {    
-        padding-top: 80px;
-        padding-right: 60px;
-        padding-left: 60px;
+        padding-top: 100px;
+        padding-right: 50px;
+        padding-left: 50px;
         padding-bottom: 100px;
     }
     #bottom-section-close-btn {
@@ -465,6 +479,18 @@ body {
 
 
 
+
+/* =========== */
+/*    SWITCH   */
+/* =========== */
+/* 
+    Dans l'HTML on veut:
+
+    <label class="switch">
+        <input type="checkbox">
+        <span class="slider round"></span>
+    </label>
+*/
 
 :root {
     --switch-width: 35px;
