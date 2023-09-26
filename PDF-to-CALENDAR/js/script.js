@@ -497,9 +497,9 @@ document.getElementById('nameDropdown').addEventListener('change', function() {
             if ( tempRow.includes('digital sport') ) { nameInput.value = 'RTS DIGI SPORT' }
             if ( tempRow.includes('refonte actu') ) { nameInput.value = 'RTS ACTU23' }
             if ( tempRow.includes('autopromotion') ) { nameInput.value = 'RTS AUTOPROMO' }
-
             if ( horraire == '10h15-13h15' ) { nameInput.value = 'RTS GROP2' }
             if ( horraire == '14h30-20h15' ) { nameInput.value = 'RTS GROP2' }
+            if ( tempRow.includes('doublure') ) { nameInput.value += ' (doublure)' }
             nameTd.appendChild(nameInput);
             row.appendChild(nameTd);
 
