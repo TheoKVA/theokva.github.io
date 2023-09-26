@@ -58,6 +58,9 @@ window.addEventListener('dragover', function(e) {
 });
 
 window.addEventListener("dragenter", function(e) {
+
+    if(calendarSectionIsOpen) return;
+
     dragDepth++;
 
     if (dragDepth === 1) {
@@ -88,8 +91,11 @@ window.addEventListener("dragleave", function(e) {
 });
 
 window.addEventListener("drop", function(e) {
+
     e.preventDefault();
     e.stopPropagation();
+
+    if(calendarSectionIsOpen) return;
 
     dragDepth = 0; // reset the counter
     
