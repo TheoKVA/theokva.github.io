@@ -74,9 +74,18 @@ body {
     bottom: 0;
     margin: 20px;
     cursor: pointer;
+
+    opacity: 100%;
+    width: 120px;
+    height: 120px;
 }
 #info-button .title-icon-bg {
-    box-shadow: rgba(149, 157, 165, 0.15) 0px 8px 24px;
+    border-radius: 60px;
+    background: white;
+    box-shadow: rgba(149, 157, 165, 0.4) 0px 4px 24px;
+}
+#info-button .title-icon-picto {
+    width: 80px;
 }
 
 
@@ -295,6 +304,12 @@ body {
     display: block;
     pointer-events: none;
 }
+#upload-section-title .title-icon-picto {
+    top: -2px;
+}
+#calendar-section-title .title-icon-picto {
+    left: 3px;
+}
 
 .title-icon-bg {
     position: absolute;
@@ -302,7 +317,7 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgb(255, 255, 255);
+    background-color: rgba(0, 0, 0, 0.25);
     border-radius: 50px;
     z-index: -1;
 }
@@ -337,10 +352,15 @@ body {
     flex-direction: column;
     gap: 50px;
 
-    padding-top: 120px;
+    padding-top: 50px;
     padding-right: 100px;
     padding-left: 100px;
     padding-bottom: 150px;
+}
+.bottom-section-content-image {
+    width: 250px;
+    margin-bottom: -30px;
+    margin-left: -10px;
 }
 .bottom-section-content-paragraph {
     display: flex; 

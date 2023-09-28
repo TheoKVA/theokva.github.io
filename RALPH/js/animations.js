@@ -235,13 +235,20 @@ infoButton.addEventListener("click", function() {
         ease: "power2.easeOut"
     });
 
+    gsap.fromTo(infoButton, {
+        "opacity": 100,
+    },{
+        "opacity": 0,
+        duration: 0.5,
+        ease: "power1.easeOut",
+        onComplete: function() {
+            // infoButton.style.display = "none";
+        }
+    });
+
 });
 
 bottomSectionClose.addEventListener("click", function() {
-
-    // Réinitialise le scroll
-    bottomSection.style.overflowY = "hidden";
-    bottomSection.scrollTop = 0;
 
     gsap.to(":root", {
         "--cross-Y": 100,
@@ -250,8 +257,19 @@ bottomSectionClose.addEventListener("click", function() {
         ease: "power2.easeOut",
         onComplete: function() {
             bottomSectionIsOpen = false;
+
+            // Réinitialise le scroll
+            bottomSection.style.overflowY = "hidden";
+            bottomSection.scrollTop = 0;
         }
 
+    });
+
+    // infoButton.style.display = "inline-block";
+    gsap.to(infoButton, {
+        "opacity": 100,
+        duration: 0.5,
+        ease: "power1.easeOut"
     });
 
 });
