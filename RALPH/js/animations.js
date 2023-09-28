@@ -227,14 +227,6 @@ infoButton.addEventListener("click", function() {
     // Active le scroll
     bottomSection.style.overflowY = "auto";
 
-    const foldDirection = getComputedStyle(document.documentElement).getPropertyValue('--fold-direction').trim();
-    gsap.to(":root", {
-        "--cross-Y": foldDirection=='column'? 30 : 40,
-        "--title-gap": foldDirection=='column'? 12 : 2,
-        duration: 0.8,
-        ease: "power2.easeOut"
-    });
-
     gsap.fromTo(infoButton, {
         "opacity": 100,
     },{
@@ -244,6 +236,14 @@ infoButton.addEventListener("click", function() {
         onComplete: function() {
             // infoButton.style.display = "none";
         }
+    });
+
+    const foldDirection = getComputedStyle(document.documentElement).getPropertyValue('--fold-direction').trim();
+    gsap.to(":root", {
+        "--cross-Y": foldDirection=='column'? 30 : 40,
+        "--title-gap": foldDirection=='column'? 12 : 2,
+        duration: 0.8,
+        ease: "power2.easeOut"
     });
 
 });
