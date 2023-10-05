@@ -174,9 +174,14 @@ var ics = function(uidDomain, prodId) {
 
       var stamp = new Date().toISOString();
 
+      function generateCustomUID() {
+        return 'event-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
+      }
+    
       var calendarEvent = [
         'BEGIN:VEVENT',
-        'UID:' + calendarEvents.length + "@" + uidDomain,
+        // 'UID:' + calendarEvents.length + "@" + uidDomain,
+        'UID:' + generateCustomUID() + "@RALPH",
         'CLASS:PUBLIC',
         'DESCRIPTION:' + description,
         'DTSTAMP;VALUE=DATE-TIME:' + now,

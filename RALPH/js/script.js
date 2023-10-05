@@ -531,6 +531,9 @@ document.getElementById("generateButton").addEventListener("click", generateICSE
 
 // À partir de la selection on sort le .ICS
 function generateICSEvents() {
+
+    console.log('NEW EXPORT');
+
     const ics = window.ics();
 
     document.querySelectorAll('#planningTable tbody tr').forEach(row => {
@@ -551,6 +554,14 @@ function generateICSEvents() {
 
             const endDate = new Date(parseInt(dateValue[2]) + 2000, parseInt(dateValue[1]) - 1, parseInt(dateValue[0]));
             endDate.setHours(Number(endHour), Number(endMin));
+
+            var EventTemp = {
+                'nameValue': nameValue,
+                'rawValue': rawValue,
+                'startDate': startDate,
+                'endDate': endDate
+            }
+            console.log(EventTemp);
 
             ics.addEvent(
                 nameValue,
