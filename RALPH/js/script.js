@@ -73,6 +73,7 @@ function loadPDF(pdfData, fileName) {
 //   VARIABLES
 // =============
 
+// Liste pour trouver les noms dans les PDFs
 const equipeNom = [
     'CAMAIL',
     'DENIEL',
@@ -110,6 +111,7 @@ const equipeNom = [
     'HUG'
 ]
 
+// Liste pour la création des plannings
 const equipeNomBis = [
     'CAMAIL Marie-Anne',
     'DENIEL Tanguy',
@@ -147,6 +149,7 @@ const equipeNomBis = [
     'CROSTA-BLANCO Emiliano'
 ]
 
+// Génère la variable pour le planning
 let equipePlanning = equipeNom.map((nom, index) => {
     
     let nomBis;
@@ -212,7 +215,6 @@ function extractPlannification(textContent, fileName) {
 
         // Log
         // console.log(textContent);
-
 
         // ========= GET BOUNDARIES =========
 
@@ -334,7 +336,6 @@ function extractPlannification(textContent, fileName) {
                 }
                 tempObject.nom = tempNom;
 
-
                 // --- UPDATE RAW DATA ---
                 tempObject.raw = rawData;
 
@@ -350,7 +351,7 @@ function extractPlannification(textContent, fileName) {
         // Log
         // console.log(equipe);
 
-        // On envoi à makePlannification et on attends que ça résolve
+        // On envoi à makePlannification() et on attends que ça résolve
         makePlannification(equipe).then(() => {
             // console.log('OK');
             resolve();
