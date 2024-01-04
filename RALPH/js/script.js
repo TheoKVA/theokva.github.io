@@ -108,7 +108,8 @@ const equipeNom = [
     'GARCIA',
     'WILMOT',
     'CROSTA-BLANCO',
-    'HUG'
+    'HUG',
+    'FALLOT'
 ]
 
 // Liste pour la création des plannings
