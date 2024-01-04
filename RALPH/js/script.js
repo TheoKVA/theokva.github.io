@@ -147,7 +147,8 @@ const equipeNomBis = [
     'GARCIA Andrea',
     // 'HUG Sylvie',
     'WILMOT Hector',
-    'CROSTA-BLANCO Emiliano'
+    'CROSTA-BLANCO Emiliano',
+    'FALLOT Jonathan'
 ]
 
 // Génère la variable pour le planning
