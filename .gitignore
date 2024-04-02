@@ -1,2 +1,8 @@
-_autre/
+### macOS ###
+.DS_Store
+.AppleDouble
+.LSOverride
+
+### FOLDERS ###
+_AUTRE/
 BASE/
