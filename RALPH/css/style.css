@@ -4,10 +4,11 @@
 /* ==================== */
 
 :root {
-    --background-color: #fefae0;
-    --upload-section-color: #d9ab7d;
-    --calendar-section-color: #ccd5ae;
-    --bottom-section-color: #d4d1be;
+    --background-color: #f8f9fa;
+    --upload-section-color: #dee2e6;
+    --calendar-section-color: #dee2e6;
+    --bottom-section-color: #adb5bd;
+    --icons-background-color: #adb5bd;
 
     --radius-ref: 300px;
     --flex-gap: 7px;
@@ -27,11 +28,12 @@
     margin: 0;
     padding: 0;
     border: none;
-    box-sizing: border-box;
+    box-sizing: border-box; /* To make sure padding doesn't increase the overall width */
 }
 
 body {
     font-family: 'Roboto', sans-serif;
+    color: #212529;
 }
   
 
@@ -48,14 +50,14 @@ body {
     position: relative;
     padding: 10px;
     height: calc(100vh);
-    box-sizing: border-box; /* To make sure padding doesn't increase the overall width */
     background-color: var(--background-color);
     overflow-y: hidden;
 }
 
 #content-section {
     height: 100%; 
-    max-width: 900px;
+    width: 100%;
+    /* max-width: 900px; */
     margin-left: auto;
     margin-right: auto;
 
@@ -317,7 +319,7 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.25);
+    background-color: var(--icons-background-color);
     border-radius: 50px;
     z-index: -1;
 }

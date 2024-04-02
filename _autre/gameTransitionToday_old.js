@@ -78,3 +78,4 @@
         │ [ID INVEST, N°, STATUT]], Secteur, Variable, --------------- │
         │ [ID INVEST, N°, STATUT]], Secteur, Variable, --------------- │
         └─                                                             ┘
+*/
