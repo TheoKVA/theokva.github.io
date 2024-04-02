@@ -109,7 +109,8 @@ const equipeNom = [
     'WILMOT',
     'CROSTA-BLANCO',
     'HUG',
-    'FALLOT'
+    'FALLOT',
+    'SPAGNOLO'
 ]
 
 // Liste pour la création des plannings
@@ -145,7 +146,7 @@ const equipeNomBis = [
     'ESPINOSA Sebastian',
     'FESSLER Thomas',
     'GARCIA Andrea',
-    // 'HUG Sylvie',
+    'SPAGNOLO Terence',
     'WILMOT Hector',
     'CROSTA-BLANCO Emiliano',
     'FALLOT Jonathan'
@@ -395,8 +396,6 @@ function makePlannification(newDataToAdd) {
 }
 
 
-
-
 // =================
 //   MAKE CALENDAR
 // =================
@@ -585,14 +584,10 @@ function generateICSEvents() {
 
 
 
-
-
-
-// ===========
-//   ADD- ON
-// ===========
+// ==========
+//   BUNDLE
+// ==========
 
 function cleanString(str) {
     return str.split(' ').filter(Boolean).join(' ');
 }
-
