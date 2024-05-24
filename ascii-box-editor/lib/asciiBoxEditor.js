@@ -714,7 +714,7 @@ class asciiBox {
         }
     }
     pasteString(x, y, string) {
-        // console.log(string);
+        // console.log(x, y, string);
         const lines = string.split('\n');
         // console.log(lines);
         // Iterate over each line
@@ -1710,6 +1710,8 @@ class asciiBox_Workspace extends asciiBox_Tool {
     onSetOffTool() {
         if(this.aChangeOccured) this.manager.db.saveToHistory();
         this.manager.db.worldSizeHandle.classList.remove('active');
+        this.cornerPositionSaved = [0,0];
+        this.cornerPositionCurrent = [0,0];
     }
 
     onEscape() {
