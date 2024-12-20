@@ -91,23 +91,16 @@
     const bttnDownload = document.getElementById('btn-download');
 
     // OVERLAY
-    const overlayContainer = document.getElementById('overlay-container');
-    const inputImage = document.getElementById('input-image');
-    const markers = {
+    const markersOverlayContainer = document.getElementById('overlay-container');
+    const markersInputImage = document.getElementById('input-image');
+    const markersDIVelem = {
         topLeftCorner: document.getElementById('top-left-corner'),
         topRightCorner: document.getElementById('top-right-corner'),
         bottomLeftCorner: document.getElementById('bottom-left-corner'),
         bottomRightCorner: document.getElementById('bottom-right-corner'),
     };
-    const confirmButton = document.getElementById('confirm-corners');
-    const cancelButton = document.getElementById('cancel-operation');
-    const inputCorners = {
-        'top':0,
-        'left':0,
-        'imageSizeScaled': {},
-        'imageSizeOriginal': {},
-        'cornerPoints': {} // Store corner points here
-    }
+    const markersConfirmButton = document.getElementById('confirm-corners');
+    const markersCancelButton = document.getElementById('cancel-operation');
     
     // Initiates libraries
     const reader = new FileReader();
@@ -122,16 +115,21 @@
 
     // VARIABLES
     const imagesScanned = [];
+    const inputCorners = {
+        'top':0,
+        'left':0,
+        'imageSizeScaled': {},
+        'imageSizeOriginal': {},
+        'cornerPoints': {} // Store corner points here
+    }
 
 
+    // ----------
     // FILE INPUT
+    // ----------
     fileInputDIV.addEventListener('change', async (event) => {
-
-        console.log('fileInputDIV - Change');
-
         const files = event.target.files;
-        console.log('Files:', files);
-
+        
         for (const file of files) {
             console.log('Processing file:', file.name);
 
@@ -160,18 +158,18 @@
 
                     // Convert image to OpenCV mat
                     const mat = cv.imread(img);
-                    console.log('Converted image to cv.Mat.');
+                    // console.log('Converted image to cv.Mat.');
 
                     // Find the paper contour
                     const contour = scanner.findPaperContour(mat);
-                    console.log('Paper contour detected:', contour);
+                    // console.log('Paper contour detected:', contour);
 
                     // Get corner points from the contour
                     const cornerPoints = scanner.getCornerPoints(contour);
                     console.log('Corner points detected:', cornerPoints);
 
-                    // Call showOverlay to fine tune the corners
-                    showOverlay(imgSrc, cornerPoints);
+                    // Call showMarkersOverlay to fine tune the corners
+                    showMarkersOverlay(imgSrc, cornerPoints);
                 };
             };
 
@@ -292,47 +290,63 @@
     }
 
     // Function to make markers draggable
-    function makeDraggable(marker, cornerKey) {
+    function makeMarkersDraggable(marker, cornerKey) {
+        const moveAt = (x, y) => {
+            let a = inputCorners;
+            let b = inputCorners.imageSizeScaled;
+            let c = inputCorners.imageSizeOriginal;
+            // Update the UI
+            marker.style.left = `${x - 10 - a.left}px`;
+            marker.style.top = `${y - 10 - a.top}px`;
+            a.cornerPoints[cornerKey] = {
+                x: c.width * (x - a.left) / b.width, 
+                y: c.height * (y - a.top) / b.height
+            };
+        };
+
+        const onMouseMove = (e) => moveAt(e.clientX, e.clientY);
+        const onTouchMove = (e) => {
+            const touch = e.touches[0];
+            moveAt(touch.clientX, touch.clientY);
+        };
+
+        // Mouse events
         marker.addEventListener('mousedown', (e) => {
             e.preventDefault();
-
-            function moveAt(x, y) {
-                let a = inputCorners;
-                let b = inputCorners.imageSizeScaled;
-                let c = inputCorners.imageSizeOriginal;
-                // Update the UI
-                marker.style.left = `${x - 10 - a.left}px`;
-                marker.style.top = `${y - 10 - a.top}px`;
-                a.cornerPoints[cornerKey] = {
-                    x: c.width * (x - a.left) / b.width, 
-                    y: c.height * (y - a.top) / b.height
-                };
-            }
-            const onMouseMove = (e) => moveAt(e.clientX, e.clientY);
-
             document.addEventListener('mousemove', onMouseMove);
             document.addEventListener('mouseup', () => {
                 document.removeEventListener('mousemove', onMouseMove);
                 console.log(inputCorners.cornerPoints);
             }, { once: true });
         });
-    }
 
-    Object.entries(markers).forEach(([key, marker]) => {
-        makeDraggable(marker, key);
+        // Touch events
+        marker.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            const touch = e.touches[0];
+            moveAt(touch.clientX, touch.clientY); // Set initial position
+            document.addEventListener('touchmove', onTouchMove);
+            document.addEventListener('touchend', () => {
+                document.removeEventListener('touchmove', onTouchMove);
+                console.log(inputCorners.cornerPoints);
+            }, { once: true });
+        });
+    }
+    Object.entries(markersDIVelem).forEach(([key, marker]) => {
+        makeMarkersDraggable(marker, key);
     });
 
     // Confirm button logic
-    confirmButton.addEventListener('click', () => {
+    markersConfirmButton.addEventListener('click', () => {
         console.log('Adjusted Corner Points:', inputCorners.cornerPoints);
-        overlayContainer.style.display = 'none';
+        markersOverlayContainer.style.display = 'none';
 
         // Extract the paper using the confirmed corner points
-        const processedCanvas = scanner.extractPaper(inputImage, paperWidth, paperHeight, inputCorners.cornerPoints);
+        const processedCanvas = scanner.extractPaper(markersInputImage, paperWidth, paperHeight, inputCorners.cornerPoints);
         console.log('Processed canvas generated with adjusted corners.');
 
         imagesScanned.push({
-            'sourceImage': inputImage,
+            'sourceImage': markersInputImage,
             'cornerPoints': inputCorners.cornerPoints,
             'processedImage': processedCanvas,
         });
@@ -342,27 +356,27 @@
     });
 
     // Cancel button logic
-    cancelButton.addEventListener('click', () => {
+    markersCancelButton.addEventListener('click', () => {
         console.log('Operation cancelled by the user.');
-        overlayContainer.style.display = 'none';
+        markersOverlayContainer.style.display = 'none';
     });
 
     // Function to show the overlay for corner adjustment
-    function showOverlay(imgSrc, detectedCorners) {
-        inputImage.src = imgSrc;
-        inputImage.onload = () => {
+    function showMarkersOverlay(imgSrc, detectedCorners) {
+        markersInputImage.src = imgSrc;
+        markersInputImage.onload = () => {
             // Show the image
-            overlayContainer.style.display = 'flex';
+            markersOverlayContainer.style.display = 'flex';
 
             // Update the input variable
-            const rect = inputImage.getBoundingClientRect();
+            const rect = markersInputImage.getBoundingClientRect();
             console.log(rect);
             inputCorners.top = rect.top;
             inputCorners.left = rect.left;
             inputCorners.imageSizeScaled.width = rect.width;
             inputCorners.imageSizeScaled.height = rect.height;
-            inputCorners.imageSizeOriginal.width = inputImage.naturalWidth;
-            inputCorners.imageSizeOriginal.height = inputImage.naturalHeight;
+            inputCorners.imageSizeOriginal.width = markersInputImage.naturalWidth;
+            inputCorners.imageSizeOriginal.height = markersInputImage.naturalHeight;
             inputCorners.cornerPoints = detectedCorners;
 
             // Position the markers
