@@ -83,7 +83,7 @@
     fileInputDIV.addEventListener('change', async (event) => {
 
         console.log('fileInputDIV - Change');
-        
+
         const files = event.target.files;
         console.log('Files:', files);
 
@@ -176,22 +176,44 @@
             console.log('Image drawn on PDF page.');
         }
 
+        // --------------
+        // --------------
+
         const pdfBytes = await pdfDoc.save(); // Save as raw bytes
         const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+        bttnDownload.disabled = false; // Enable the button
 
+        // iOS-specific handling
         if (isIOS()) {
-            // iOS-specific handling
-            const downloadLinkIOS = document.createElement('a');
-            downloadLinkIOS.href = URL.createObjectURL(blob);
-            downloadLinkIOS.download = 'document.pdf';
-            downloadLinkIOS.style = 'display: none'; // Invisible link
+            // Enable the Share button for supported devices
+            if (navigator.share) {
+                const file = new File([blob], "document.pdf", { type: 'application/pdf' });
+                bttnDownload.addEventListener("click", async () => {
+                    try {
+                        // Use the Share API
+                        await navigator.share({
+                            title: "My PDF Document",
+                            text: "Here is the PDF document I generated.",
+                            files: [file], // Share the PDF file
+                        });
+                        console.log("PDF shared successfully!");
+                    } catch (error) {
+                        console.error("Error sharing PDF:", error);
+                    }
+                });
+            } 
+            else {
+                const downloadLinkIOS = document.createElement('a');
+                downloadLinkIOS.href = URL.createObjectURL(blob);
+                downloadLinkIOS.download = 'document.pdf';
+                downloadLinkIOS.style = 'display: none'; // Invisible link
 
-            // Append and prepare for manual trigger
-            document.body.appendChild(downloadLinkIOS);
-            bttnDownload.disabled = false; // Enable download button
-            bttnDownload.addEventListener("click", function () {
-                downloadLinkIOS.click(); // Trigger the download
-            });
+                // Append and prepare for manual trigger
+                document.body.appendChild(downloadLinkIOS);
+                bttnDownload.addEventListener("click", function () {
+                    downloadLinkIOS.click(); // Trigger the download
+                });
+            }
         } else {
             // Handling for other platforms
             const blobUrl = URL.createObjectURL(blob);
@@ -199,7 +221,6 @@
             // Update download button
             bttnDownload.href = blobUrl;
             bttnDownload.download = 'document.pdf';
-            bttnDownload.disabled = false;
 
             // Try to open in a new tab (optional fallback)
             const pdfWindow = window.open(blobUrl);
