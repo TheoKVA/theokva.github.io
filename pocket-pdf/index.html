@@ -3,24 +3,40 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pocket PDF</title>
+    <title>Pocket Scanner</title>
 
+
+    <!-- STYLE -->
+    <link rel="stylesheet" href="/css/main.css">
+
+    <!-- LIBRAIRIES JS -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"> </script>
     <script src="https://cdn.jsdelivr.net/npm/pdf-lib/dist/pdf-lib.min.js"></script>
-    <!-- <script src="https://cdn.jsdelivr.net/npm/jscanify"></script> -->
-
     <script src="https://cdn.jsdelivr.net/npm/heic2any/dist/heic2any.min.js"></script>
-
     <script src="https://docs.opencv.org/4.7.0/opencv.js" async></script>
     <script src="https://cdn.jsdelivr.net/gh/ColonelParrot/jscanify@master/src/jscanify.min.js"></script>
 
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            margin: 0;
-            padding: 0;
-        }
+    <!-- SCRIPT -->
+    <script src="script.js" defer></script>
+    
+    
+</head>
+<body>
+    <h2>Pocket PDF</h2>
+    <p>Upload or take photos of your documents to assemble them into a PDF.</p>
 
+    <button id="btn-add-image">Add image</button>
+    <input id="js-fileInput" type="file" accept="image/*" capture="environment" multiple style="display: none;">
+    <style>
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+    </style>
+
+    <div id="js-preview"></div>
+    <style>
         #js-preview {
             display: flex;
             flex-wrap: wrap;
@@ -31,44 +47,102 @@
         #js-preview > * {
             margin: 10px;
             border: 1px solid #ccc;
-            padding: 10px;
-            max-width: 200px;
-        }
-
-        button {
-            padding: 10px 20px;
-            font-size: 16px;
-            cursor: pointer;
+            padding: 5px;
+            max-width: 100px;
         }
     </style>
-</head>
-<body>
-    <h1>Pocket PDF</h1>
-    <p>Upload or take photos of your documents to assemble them into a PDF.</p>
-
-    <button id="btn-add-image">Add image</button>
-    <input id="js-fileInput" type="file" accept="image/*" capture="environment" multiple style="display: none;">
-
-    <div id="js-preview"></div>
     
     <button id="btn-generate-pdf">Generate PDF</button>
     <button id="btn-download-pdf" disabled>Download PDF</button>
 
-    <!-- CORNER SELECTION -->
-    <div id="markers-container" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.8); z-index: 9998; align-items: center; justify-content: center;">
-        <div id="adjustment-container" style="position: relative; width: 90%; max-width: 500px; background-color: white; padding: 20px; border-radius: 10px; text-align: center;">
-            <h3>Adjust Corners</h3>
-            <div id="image-container" style="position: relative; display: inline-block; width: 100%;">
-                <img id="input-image" src="" alt="Loaded Image" style="max-width: 100%; display: block;">
+    <!-- CORNER SELECTION OVERLAY -->
+    <div id="parameters-container">
+        <div id="adjustment-container">
+
+            <!-- Image and Corner Adjustment -->
+            <div id="image-container" style="position: relative; display: inline-block; width: 100%; margin-bottom: 20px;">
+                <img id="input-image" src="" alt="Loaded Image" style="max-width: 100%; max-height: 500px; display: block;">
                 <div id="top-left-corner" class="corner-marker"></div>
                 <div id="top-right-corner" class="corner-marker"></div>
                 <div id="bottom-left-corner" class="corner-marker"></div>
                 <div id="bottom-right-corner" class="corner-marker"></div>
             </div>
+            
+            <!-- Format Selection -->
+            <div style="margin-bottom: 20px; display:none;">
+                <label for="format-select">Format:</label>
+                <select id="format-select">
+                    <option value="A4" selected>A4</option>
+                    <option value="Letter">Letter</option>
+                    <option value="Custom">Custom</option>
+                </select>
+            </div>
+            
+            <!-- Orientation Selection -->
+            <div style="margin-bottom: 20px; display:none;">
+                <label>Orientation:</label><br>
+                <label><input type="radio" name="orientation" value="vertical" checked> Vertical</label>
+                <label><input type="radio" name="orientation" value="horizontal"> Horizontal</label>
+            </div>
+            
+            <!-- Color Mode Selection -->
+            <div style="margin-bottom: 20px; display:none;">
+                <label for="color-mode-select">Mode:</label>
+                <select id="color-mode-select">
+                    <option value="color">Color</option>
+                    <option value="grayscale">Grayscale</option>
+                    <option value="auto" selected>Auto</option>
+                </select>
+            </div>
+            
+            <!-- Color Levels Adjustment -->
+            <div style="margin-bottom: 20px; display:none;">
+                <label>Color Levels:</label>
+                <div>
+                    <label for="white-level">White:</label>
+                    <input id="white-level" type="range" min="0" max="255" value="255">
+                </div>
+                <div>
+                    <label for="middle-level">Middle:</label>
+                    <input id="middle-level" type="range" min="0" max="255" value="127">
+                </div>
+                <div>
+                    <label for="black-level">Black:</label>
+                    <input id="black-level" type="range" min="0" max="255" value="0">
+                </div>
+            </div>
+            
+            <!-- Action Buttons -->
             <button id="confirm-corners">OK</button>
             <button id="cancel-operation">Cancel</button>
         </div>
+        
         <style>
+            #parameters-container {
+                display: none;
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-color: rgba(0, 0, 0, 0.8);
+                z-index: 9998;
+                overflow-y: auto; /* Enable vertical scrolling */
+                align-items: flex-start; /* Align content to the top */
+                justify-content: center;
+                /* padding: 20px; Add padding for better appearance */
+            }
+
+            #adjustment-container {
+                position: relative;
+                width: 90%;
+                max-width: 500px;
+                background-color: white;
+                padding: 20px;
+                border-radius: 10px;
+                text-align: center;
+                margin: auto; /* Center the adjustment container */
+            }
             .corner-marker {
                 position: absolute;
                 width: 20px;
@@ -81,7 +155,8 @@
         </style>
     </div>
 
-    <!-- LOADING -->
+
+    <!-- LOADING OVERLAY -->
     <div id="loading-overlay" style="display: none;">
         <div class="loading-circle"></div>
         <style>
@@ -99,12 +174,12 @@
             }
         
             .loading-circle {
-                width: 50px;
-                height: 50px;
-                border: 5px solid rgba(255, 255, 255, 0.6);
+                width: 40px;
+                height: 40px;
+                border: 3px solid rgba(255, 255, 255, 0.4);
                 border-top-color: white;
                 border-radius: 50%;
-                animation: spin 1s linear infinite;
+                animation: spin 1.5s linear infinite;
             }
         
             @keyframes spin {
@@ -123,6 +198,43 @@
 </body>
 
 <script>
+    /*
+
+    OBJECTIFS
+
+        Clean DB ✅
+            update au clic sur l'element ✅
+
+        Ajout de param
+            option format
+            option orientation
+                Change l'UI des éléments ajoutés
+            Couleurs
+                option couleurs / BW / auto
+                option niveaux
+                update UI
+
+        reload des param ✅
+            Si pas changement on update pas au OK ✅
+            Si cancel on update pas ✅
+
+        Option pour l'export
+            DPI choix
+            Compression choix
+            Optimisation de la taille du document
+            Choix du format
+
+        possibilité de changer l'ordre des preview
+            drag-drop ?
+    
+    
+    
+    
+    
+    
+    
+    
+    */
 
     // HTML
     const fileInputDIV = document.getElementById('js-fileInput');
@@ -131,18 +243,6 @@
     const generatePdfButton = document.getElementById('btn-generate-pdf');
     const downloadPdfButton = document.getElementById('btn-download-pdf');
 
-    // MARKERS
-    const markersContainer = document.getElementById('markers-container');
-    const markersInputImage = document.getElementById('input-image');
-    const markersDIVelem = {
-        topLeftCorner: document.getElementById('top-left-corner'),
-        topRightCorner: document.getElementById('top-right-corner'),
-        bottomLeftCorner: document.getElementById('bottom-left-corner'),
-        bottomRightCorner: document.getElementById('bottom-right-corner'),
-    };
-    const markersConfirmButton = document.getElementById('confirm-corners');
-    const markersCancelButton = document.getElementById('cancel-operation');
-    
     // LIBRARIES
     const reader = new FileReader();
     const scanner = new jscanify();
@@ -150,19 +250,11 @@
     // INPUT
     const paperWidthMM = 210;
     const paperHeightMM = 297;
-    const paperDPI = 300 
+    const paperDPI = 300;
     const paperWidth = Math.round( paperWidthMM / 25.4 * paperDPI); // in PX
     const paperHeight = Math.round( paperHeightMM / 25.4 * paperDPI); // in PX
 
-    // VARIABLES
-    const imagesScanned = [];
-    const inputCorners = {
-        'top':0,
-        'left':0,
-        'imageSizeScaled': {},
-        'imageSizeOriginal': {},
-        'cornerPoints': {} // Store corner points here
-    }
+    
 
 
     // ==========
@@ -242,14 +334,250 @@
                     const cornerPoints = scanner.getCornerPoints(contour);
                     console.log('Corner points detected:', cornerPoints);
 
-                    // Call showMarkersOverlay to fine tune the corners
-                    showMarkersOverlay(imgSrc, cornerPoints);
+                    // Call showParameters to fine tune the corners
+                    showParameters(-1, imgSrc, cornerPoints);
                 };
             };
 
             reader.readAsDataURL(file);
         }
     });
+
+
+
+    // ================
+    // IMAGE PARAMETERS
+    // ================
+
+    // HTML elements
+    const parametersContainer = document.getElementById('parameters-container');
+    const parametersInputImage = document.getElementById('input-image');
+    const parametersMarkers = {
+        topLeftCorner: document.getElementById('top-left-corner'),
+        topRightCorner: document.getElementById('top-right-corner'),
+        bottomLeftCorner: document.getElementById('bottom-left-corner'),
+        bottomRightCorner: document.getElementById('bottom-right-corner'),
+    };
+    const parametersConfirmButton = document.getElementById('confirm-corners');
+    const parametersCancelButton = document.getElementById('cancel-operation');
+    
+    // Variable to store all the images
+    const db = [];
+    const defaultEntrie = {
+        'index': -1, // TO DO
+        'changeOccured': true,
+        'imageParameters': { // TO DO
+            'format': 'A4',
+            'orientation': 'vertical', // vertical / horizontal
+            'colorMode': 'auto', // auto / color / grayscale
+            'levels': {
+                'black': 0,
+                'middle': 125,
+                'white': 255
+            },
+        },
+        'imageOriginal': {
+            'source': '',
+            'width': -1,
+            'height': -1,
+        },
+        'imageProcessed' : {},
+        'imageScaled': {}, // top, left, width, height
+        'cornerPoints': {},
+    }
+    // Variable for storing temp parameters
+    let tempEntrie = {};
+
+    // Function to show the overlay of the parameters for each page
+    function showParameters(inputIndex, inputImgSrc, inputCorners) {
+        if (inputIndex === -1) {
+            // Use default Entrie
+            tempEntrie = { ...defaultEntrie };
+            tempEntrie.imageOriginal.source = inputImgSrc;
+            tempEntrie.cornerPoints = inputCorners;
+        } else if (inputIndex >= 0 && inputIndex < db.length) {
+            // Load entrie from DB
+            tempEntrie = { ...db[inputIndex] };
+        } else {
+            console.error('Invalid input index:', inputIndex);
+            return;
+        }
+
+        // Load image in parameters window
+        parametersInputImage.src = tempEntrie.imageOriginal.source;
+        parametersInputImage.onload = () => {
+
+            // UI
+            hideLoading();
+            parametersContainer.style.display = 'flex';
+
+            // Update the input variable
+            const rect = parametersInputImage.getBoundingClientRect();
+            tempEntrie.imageScaled.width = rect.width;
+            tempEntrie.imageScaled.height = rect.height;
+            tempEntrie.imageScaled.top = rect.top;
+            tempEntrie.imageScaled.left = rect.left;
+            tempEntrie.imageOriginal.width = parametersInputImage.naturalWidth;
+            tempEntrie.imageOriginal.height = parametersInputImage.naturalHeight;
+
+            // Position the UI markers
+            positionMarkers();
+        };
+    }
+
+    // 
+    function updateParameters() {
+        // update format etc
+        // aplique le filtre à l'image aussi
+    }
+
+    // Function to position markers based on corner points
+    function positionMarkers() {
+        let a = tempEntrie;
+        let b = tempEntrie.imageScaled;
+        let c = tempEntrie.imageOriginal;
+        let d = tempEntrie.cornerPoints;
+
+        parametersMarkers.topLeftCorner.style.left = `${- 10 + (b.width * d.topLeftCorner.x / c.width)}px`;
+        parametersMarkers.topLeftCorner.style.top = `${- 10 + (b.height * d.topLeftCorner.y / c.height)}px`;
+
+        parametersMarkers.topRightCorner.style.left = `${- 10 + (b.width * d.topRightCorner.x / c.width)}px`;
+        parametersMarkers.topRightCorner.style.top = `${- 10 + (b.height * d.topRightCorner.y / c.height)}px`;
+
+        parametersMarkers.bottomLeftCorner.style.left = `${- 10 + (b.width * d.bottomLeftCorner.x / c.width)}px`;
+        parametersMarkers.bottomLeftCorner.style.top = `${- 10 + (b.height * d.bottomLeftCorner.y / c.height)}px`;
+
+        parametersMarkers.bottomRightCorner.style.left = `${- 10 + (b.width * d.bottomRightCorner.x / c.width)}px`;
+        parametersMarkers.bottomRightCorner.style.top = `${- 10 + (b.height * d.bottomRightCorner.y / c.height)}px`;
+    }
+
+    // Function to make markers draggable (only once)
+    function makeMarkersDraggable(marker, cornerKey) {
+        const markerOffset = { x: -30, y: -30 }; // Finger offset
+    
+        const moveAt = (x, y) => {
+            let a = tempEntrie;
+            let b = tempEntrie.imageScaled;
+            let c = tempEntrie.imageOriginal;
+            // Update the UI
+            marker.style.left = `${Math.max(-10, x - 10 - b.left)}px`;
+            marker.style.top = `${Math.max(-10, y - 10 - b.top)}px`;
+            a.cornerPoints[cornerKey] = {
+                x: c.width * (x - b.left) / b.width, 
+                y: c.height * (y - b.top) / b.height
+            };
+            // on indique un changement
+            tempEntrie.changeOccured = true;
+        };
+
+        const onMouseMove = (e) => moveAt(e.clientX, e.clientY);
+        const onTouchMove = (e) => {
+            const touch = e.touches[0];
+            moveAt(touch.clientX + markerOffset.x, touch.clientY + markerOffset.y);
+        };
+
+        // Mouse events
+        marker.addEventListener('mousedown', (e) => {
+            e.preventDefault();
+            document.addEventListener('mousemove', onMouseMove);
+            document.addEventListener('mouseup', () => {
+                document.removeEventListener('mousemove', onMouseMove);
+                // console.log(tempEntrie.cornerPoints);
+            }, { once: true });
+        });
+
+        // Touch events
+        marker.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            const touch = e.touches[0];
+            moveAt(touch.clientX + markerOffset.x, touch.clientY + markerOffset.y); // Set initial position
+            document.addEventListener('touchmove', onTouchMove);
+            document.addEventListener('touchend', () => {
+                document.removeEventListener('touchmove', onTouchMove);
+                // console.log(tempEntrie.cornerPoints);
+            }, { once: true });
+        });
+    }
+    // Add all the events to the corners
+    Object.entries(parametersMarkers).forEach(([key, marker]) => {
+        makeMarkersDraggable(marker, key);
+    });
+
+    // CONFIRM BTN
+    parametersConfirmButton.addEventListener('click', () => {
+        console.log('CONFIRM');
+
+        // Si pas de changements on saute
+        if(!tempEntrie.changeOccured) {
+            console.log('changeOccured', tempEntrie.changeOccured);
+            parametersContainer.style.display = 'none';
+            return
+        }
+
+        // UI
+        showLoading();
+        parametersContainer.style.display = 'none';
+
+        // Create the entrie to be stored in the db
+        const dataEntrie = { ...tempEntrie };
+        // Update the index if -1
+        if (tempEntrie.index === -1) dataEntrie.index = db.length;
+
+        // Extract the paper using the confirmed corner points
+        const processedCanvas = scanner.extractPaper(parametersInputImage, paperWidth, paperHeight, tempEntrie.cornerPoints);
+        // Update the HTML element
+        processedCanvas.setAttribute('data-index', dataEntrie.index);
+        processedCanvas.addEventListener('click', () => {
+            const index = processedCanvas.getAttribute('data-index');
+            console.log('CLICK on element', index);
+            showParameters(index);
+        });
+        // Add the canvas to the data
+        dataEntrie.imageProcessed= processedCanvas;
+        dataEntrie.changeOccured= false;
+
+        // Add or update the DB
+        if (tempEntrie.index === -1 || tempEntrie.index >= db.length) {
+            db.push(dataEntrie);
+            previewDIV.appendChild(processedCanvas); // Add HTML element
+        } else {
+            // Update existing entry at the specified index
+            db[tempEntrie.index] = dataEntrie;
+
+            // Find the existing canvas in previewDIV with matching data-index
+            const existingCanvas = previewDIV.querySelector(`[data-index='${tempEntrie.index}']`);
+            if (existingCanvas) {
+                previewDIV.replaceChild(processedCanvas, existingCanvas); // Replace in the DOM
+            } else {
+                console.error(`No existing canvas found for index ${tempEntrie.index}`);
+            }
+        }
+
+        console.log('Processed image updated.');
+        hideLoading();
+    });
+
+    // CANCEL BTN
+    parametersCancelButton.addEventListener('click', () => {
+        console.log('CANCEL');
+        parametersContainer.style.display = 'none';
+    });
+
+
+
+    // =======
+    // LOADING
+    // =======
+
+    function showLoading() {
+        const loadingOverlay = document.getElementById('loading-overlay');
+        loadingOverlay.style.display = 'flex';
+    }
+
+    function hideLoading() {
+        const loadingOverlay = document.getElementById('loading-overlay');
+        loadingOverlay.style.display = 'none';
+    }
 
 
     // ============
@@ -268,10 +596,10 @@
         // POPULATE PDF
         // ------------
 
-        for (const imageScanned of imagesScanned) {
+        for (const imageScanned of db) {
 
             // Chope la version processed
-            const image = imageScanned.processedImage
+            const image = imageScanned.imageProcessed
             console.log('Embedding image into PDF:', image);
             
             const imgBytes = await fetch(image.toDataURL('image/jpeg')).then((res) => res.arrayBuffer());
@@ -342,151 +670,10 @@
                 console.warn('Popup blocked. Download link enabled instead.');
             }
         }
+
     });
 
 
-
-    // ================
-    // MARKER SELECTION
-    // ================
-
-    // Function to position markers based on corner points
-    function positionMarkers() {
-        console.log(inputCorners);
-
-        let a = inputCorners;
-        let b = inputCorners.imageSizeScaled;
-        let c = inputCorners.imageSizeOriginal;
-        let d = inputCorners.cornerPoints;
-
-        markersDIVelem.topLeftCorner.style.left = `${- 10 + (b.width * d.topLeftCorner.x / c.width)}px`;
-        markersDIVelem.topLeftCorner.style.top = `${- 10 + (b.height * d.topLeftCorner.y / c.height)}px`;
-
-        markersDIVelem.topRightCorner.style.left = `${- 10 + (b.width * d.topRightCorner.x / c.width)}px`;
-        markersDIVelem.topRightCorner.style.top = `${- 10 + (b.height * d.topRightCorner.y / c.height)}px`;
-
-        markersDIVelem.bottomLeftCorner.style.left = `${- 10 + (b.width * d.bottomLeftCorner.x / c.width)}px`;
-        markersDIVelem.bottomLeftCorner.style.top = `${- 10 + (b.height * d.bottomLeftCorner.y / c.height)}px`;
-
-        markersDIVelem.bottomRightCorner.style.left = `${- 10 + (b.width * d.bottomRightCorner.x / c.width)}px`;
-        markersDIVelem.bottomRightCorner.style.top = `${- 10 + (b.height * d.bottomRightCorner.y / c.height)}px`;
-    }
-
-    // Function to make markers draggable
-    function makeMarkersDraggable(marker, cornerKey) {
-        const markerOffset = { x: -30, y: -30 }; // Finger offset
-    
-        const moveAt = (x, y) => {
-            let a = inputCorners;
-            let b = inputCorners.imageSizeScaled;
-            let c = inputCorners.imageSizeOriginal;
-            // Update the UI
-            marker.style.left = `${x - 10 - a.left}px`;
-            marker.style.top = `${y - 10 - a.top}px`;
-            a.cornerPoints[cornerKey] = {
-                x: c.width * (x - a.left) / b.width, 
-                y: c.height * (y - a.top) / b.height
-            };
-        };
-
-        const onMouseMove = (e) => moveAt(e.clientX, e.clientY);
-        const onTouchMove = (e) => {
-            const touch = e.touches[0];
-            moveAt(touch.clientX + markerOffset.x, touch.clientY + markerOffset.y);
-        };
-
-        // Mouse events
-        marker.addEventListener('mousedown', (e) => {
-            e.preventDefault();
-            document.addEventListener('mousemove', onMouseMove);
-            document.addEventListener('mouseup', () => {
-                document.removeEventListener('mousemove', onMouseMove);
-                console.log(inputCorners.cornerPoints);
-            }, { once: true });
-        });
-
-        // Touch events
-        marker.addEventListener('touchstart', (e) => {
-            e.preventDefault();
-            const touch = e.touches[0];
-            moveAt(touch.clientX + markerOffset.x, touch.clientY + markerOffset.y); // Set initial position
-            document.addEventListener('touchmove', onTouchMove);
-            document.addEventListener('touchend', () => {
-                document.removeEventListener('touchmove', onTouchMove);
-                console.log(inputCorners.cornerPoints);
-            }, { once: true });
-        });
-    }
-    Object.entries(markersDIVelem).forEach(([key, marker]) => {
-        makeMarkersDraggable(marker, key);
-    });
-
-    // Confirm button logic
-    markersConfirmButton.addEventListener('click', () => {
-        console.log('Adjusted Corner Points:', inputCorners.cornerPoints);
-        markersContainer.style.display = 'none';
-
-        // Extract the paper using the confirmed corner points
-        const processedCanvas = scanner.extractPaper(markersInputImage, paperWidth, paperHeight, inputCorners.cornerPoints);
-        console.log('Processed canvas generated with adjusted corners.');
-
-        imagesScanned.push({
-            'sourceImage': markersInputImage,
-            'cornerPoints': inputCorners.cornerPoints,
-            'processedImage': processedCanvas,
-        });
-
-        previewDIV.appendChild(processedCanvas);
-        console.log('Processed image preview added to the page.');
-    });
-
-    // Cancel button logic
-    markersCancelButton.addEventListener('click', () => {
-        console.log('Operation cancelled by the user.');
-        markersContainer.style.display = 'none';
-    });
-
-    // Function to show the overlay for corner adjustment
-    function showMarkersOverlay(imgSrc, detectedCorners) {
-        markersInputImage.src = imgSrc;
-        markersInputImage.onload = () => {
-            // Hide Loading
-            hideLoading();
-
-            // Show the image
-            markersContainer.style.display = 'flex';
-
-            // Update the input variable
-            const rect = markersInputImage.getBoundingClientRect();
-            console.log(rect);
-            inputCorners.top = rect.top;
-            inputCorners.left = rect.left;
-            inputCorners.imageSizeScaled.width = rect.width;
-            inputCorners.imageSizeScaled.height = rect.height;
-            inputCorners.imageSizeOriginal.width = markersInputImage.naturalWidth;
-            inputCorners.imageSizeOriginal.height = markersInputImage.naturalHeight;
-            inputCorners.cornerPoints = detectedCorners;
-
-            // Position the markers
-            positionMarkers();
-        };
-    }
-
-
-
-    // =======
-    // LOADING
-    // =======
-
-    function showLoading() {
-        const loadingOverlay = document.getElementById('loading-overlay');
-        loadingOverlay.style.display = 'flex';
-    }
-
-    function hideLoading() {
-        const loadingOverlay = document.getElementById('loading-overlay');
-        loadingOverlay.style.display = 'none';
-    }
 
     // ======
     // HELPER
