@@ -51,11 +51,11 @@
 
     <div id="js-preview"></div>
     
-    <button id="btn-generate">Generate PDF</button>
-    <button id="btn-download" disabled>Download PDF</button>
+    <button id="btn-generate-pdf">Generate PDF</button>
+    <button id="btn-download-pdf" disabled>Download PDF</button>
 
     <!-- CORNER SELECTION -->
-    <div id="overlay-container" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.8); z-index: 9999; align-items: center; justify-content: center;">
+    <div id="markers-container" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.8); z-index: 9998; align-items: center; justify-content: center;">
         <div id="adjustment-container" style="position: relative; width: 90%; max-width: 500px; background-color: white; padding: 20px; border-radius: 10px; text-align: center;">
             <h3>Adjust Corners</h3>
             <div id="image-container" style="position: relative; display: inline-block; width: 100%;">
@@ -73,13 +73,52 @@
                 position: absolute;
                 width: 20px;
                 height: 20px;
-                background-color: red;
+                background-color: rgba(0, 255, 221, 0.71);
                 border-radius: 50%;
                 cursor: pointer;
                 touch-action: none; /* Prevent scrolling during touch */
             }
         </style>
     </div>
+
+    <!-- LOADING -->
+    <div id="loading-overlay" style="display: none;">
+        <div class="loading-circle"></div>
+        <style>
+            #loading-overlay {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-color: rgba(0, 0, 0, 0.6);
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                z-index: 9999;
+            }
+        
+            .loading-circle {
+                width: 50px;
+                height: 50px;
+                border: 5px solid rgba(255, 255, 255, 0.6);
+                border-top-color: white;
+                border-radius: 50%;
+                animation: spin 1s linear infinite;
+            }
+        
+            @keyframes spin {
+                from {
+                    transform: rotate(0deg);
+                }
+                to {
+                    transform: rotate(360deg);
+                }
+            }
+        </style>
+    </div>
+    
+    
     
 </body>
 
@@ -87,13 +126,13 @@
 
     // HTML
     const fileInputDIV = document.getElementById('js-fileInput');
-    const addButton = document.getElementById('btn-add-image');
     const previewDIV = document.getElementById('js-preview');
-    const bttnGenerate = document.getElementById('btn-generate');
-    const bttnDownload = document.getElementById('btn-download');
+    const addButton = document.getElementById('btn-add-image');
+    const generatePdfButton = document.getElementById('btn-generate-pdf');
+    const downloadPdfButton = document.getElementById('btn-download-pdf');
 
-    // OVERLAY
-    const markersOverlayContainer = document.getElementById('overlay-container');
+    // MARKERS
+    const markersContainer = document.getElementById('markers-container');
     const markersInputImage = document.getElementById('input-image');
     const markersDIVelem = {
         topLeftCorner: document.getElementById('top-left-corner'),
@@ -104,7 +143,7 @@
     const markersConfirmButton = document.getElementById('confirm-corners');
     const markersCancelButton = document.getElementById('cancel-operation');
     
-    // Initiates libraries
+    // LIBRARIES
     const reader = new FileReader();
     const scanner = new jscanify();
     
@@ -126,28 +165,57 @@
     }
 
 
-    // ----------
+    // ==========
     // FILE INPUT
-    // ----------
+    // ==========
+
     // Add click event listener to the button
     addButton.addEventListener('click', () => {
         fileInputDIV.click(); // Simulate a click on the file input
+    });
+
+    // Handle drag and drop on the window
+    window.addEventListener('dragover', (e) => {
+        e.preventDefault(); // Prevent default behavior (e.g., open file in browser)
+        e.dataTransfer.dropEffect = 'copy'; // Indicate that a copy is expected
+    });
+    window.addEventListener('drop', (e) => {
+        e.preventDefault(); // Prevent default behavior
+        const files = e.dataTransfer.files;
+
+        // Check if there are any image files
+        for (const file of files) {
+            if (file.type.startsWith('image/')) {
+                console.log('Image file dropped.');
+
+                // Create a FileList-like object and trigger the file input's change event
+                const dataTransfer = new DataTransfer();
+                dataTransfer.items.add(file);
+
+                // Update the file input's files property
+                fileInputDIV.files = dataTransfer.files;
+
+                // Trigger the change event manually
+                fileInputDIV.dispatchEvent(new Event('change'));
+                break;
+            }
+        }
     });
     fileInputDIV.addEventListener('change', async (event) => {
         const files = event.target.files;
         
         for (const file of files) {
+            showLoading();
             console.log('Processing file:', file.name);
 
             const reader = new FileReader();
             reader.onload = async (e) => {
-                console.log('FileReader onload event triggered.');
 
                 let imgSrc = e.target.result;
 
                 // If the file is HEIC, convert it
                 if (file.type === 'image/heic' || file.type === 'image/heif') {
-                    console.log('HEIC image detected');
+                    console.log('HEIC image conversion..');
                     try {
                         const heicToJpg = await heic2any({ blob: file, toType: 'image/jpeg' });
                         imgSrc = URL.createObjectURL(heicToJpg);
@@ -188,13 +256,13 @@
     // GENERATE PDF
     // ============
 
-    bttnGenerate.addEventListener('click', async () => {
+    generatePdfButton.addEventListener('click', async () => {
 
         console.log('Generate PDF button clicked.');
+        showLoading();
 
         const pdfDoc = await PDFLib.PDFDocument.create();
         console.log('PDF document created.');
-
 
         // ------------
         // POPULATE PDF
@@ -225,14 +293,16 @@
 
         const pdfBytes = await pdfDoc.save(); // Save as raw bytes
         const blob = new Blob([pdfBytes], { type: 'application/pdf' });
-        bttnDownload.disabled = false; // Enable the button
+        downloadPdfButton.disabled = false; // Enable the button
+
+        hideLoading();
 
         // iOS-specific handling
         if (isIOS()) {
             // Enable the Share button for supported devices
             if (navigator.share) {
                 const file = new File([blob], "document.pdf", { type: 'application/pdf' });
-                bttnDownload.addEventListener("click", async () => {
+                downloadPdfButton.addEventListener("click", async () => {
                     try {
                         // Use the Share API
                         await navigator.share({
@@ -254,7 +324,7 @@
 
                 // Append and prepare for manual trigger
                 document.body.appendChild(downloadLinkIOS);
-                bttnDownload.addEventListener("click", function () {
+                downloadPdfButton.addEventListener("click", function () {
                     downloadLinkIOS.click(); // Trigger the download
                 });
             }
@@ -263,8 +333,8 @@
             const blobUrl = URL.createObjectURL(blob);
 
             // Update download button
-            bttnDownload.href = blobUrl;
-            bttnDownload.download = 'document.pdf';
+            downloadPdfButton.href = blobUrl;
+            downloadPdfButton.download = 'document.pdf';
 
             // Try to open in a new tab (optional fallback)
             const pdfWindow = window.open(blobUrl);
@@ -304,6 +374,8 @@
 
     // Function to make markers draggable
     function makeMarkersDraggable(marker, cornerKey) {
+        const markerOffset = { x: -30, y: -30 }; // Finger offset
+    
         const moveAt = (x, y) => {
             let a = inputCorners;
             let b = inputCorners.imageSizeScaled;
@@ -320,7 +392,7 @@
         const onMouseMove = (e) => moveAt(e.clientX, e.clientY);
         const onTouchMove = (e) => {
             const touch = e.touches[0];
-            moveAt(touch.clientX, touch.clientY);
+            moveAt(touch.clientX + markerOffset.x, touch.clientY + markerOffset.y);
         };
 
         // Mouse events
@@ -337,7 +409,7 @@
         marker.addEventListener('touchstart', (e) => {
             e.preventDefault();
             const touch = e.touches[0];
-            moveAt(touch.clientX, touch.clientY); // Set initial position
+            moveAt(touch.clientX + markerOffset.x, touch.clientY + markerOffset.y); // Set initial position
             document.addEventListener('touchmove', onTouchMove);
             document.addEventListener('touchend', () => {
                 document.removeEventListener('touchmove', onTouchMove);
@@ -352,7 +424,7 @@
     // Confirm button logic
     markersConfirmButton.addEventListener('click', () => {
         console.log('Adjusted Corner Points:', inputCorners.cornerPoints);
-        markersOverlayContainer.style.display = 'none';
+        markersContainer.style.display = 'none';
 
         // Extract the paper using the confirmed corner points
         const processedCanvas = scanner.extractPaper(markersInputImage, paperWidth, paperHeight, inputCorners.cornerPoints);
@@ -371,15 +443,18 @@
     // Cancel button logic
     markersCancelButton.addEventListener('click', () => {
         console.log('Operation cancelled by the user.');
-        markersOverlayContainer.style.display = 'none';
+        markersContainer.style.display = 'none';
     });
 
     // Function to show the overlay for corner adjustment
     function showMarkersOverlay(imgSrc, detectedCorners) {
         markersInputImage.src = imgSrc;
         markersInputImage.onload = () => {
+            // Hide Loading
+            hideLoading();
+
             // Show the image
-            markersOverlayContainer.style.display = 'flex';
+            markersContainer.style.display = 'flex';
 
             // Update the input variable
             const rect = markersInputImage.getBoundingClientRect();
@@ -398,6 +473,20 @@
     }
 
 
+
+    // =======
+    // LOADING
+    // =======
+
+    function showLoading() {
+        const loadingOverlay = document.getElementById('loading-overlay');
+        loadingOverlay.style.display = 'flex';
+    }
+
+    function hideLoading() {
+        const loadingOverlay = document.getElementById('loading-overlay');
+        loadingOverlay.style.display = 'none';
+    }
 
     // ======
     // HELPER
