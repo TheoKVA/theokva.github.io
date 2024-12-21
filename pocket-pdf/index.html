@@ -46,7 +46,8 @@
     <h1>Pocket PDF</h1>
     <p>Upload or take photos of your documents to assemble them into a PDF.</p>
 
-    <input id="js-fileInput" type="file" accept="image/*" capture="environment" multiple>
+    <button id="btn-add-image">Add image</button>
+    <input id="js-fileInput" type="file" accept="image/*" capture="environment" multiple style="display: none;">
 
     <div id="js-preview"></div>
     
@@ -86,6 +87,7 @@
 
     // HTML
     const fileInputDIV = document.getElementById('js-fileInput');
+    const addButton = document.getElementById('btn-add-image');
     const previewDIV = document.getElementById('js-preview');
     const bttnGenerate = document.getElementById('btn-generate');
     const bttnDownload = document.getElementById('btn-download');
@@ -127,6 +129,10 @@
     // ----------
     // FILE INPUT
     // ----------
+    // Add click event listener to the button
+    addButton.addEventListener('click', () => {
+        fileInputDIV.click(); // Simulate a click on the file input
+    });
     fileInputDIV.addEventListener('change', async (event) => {
         const files = event.target.files;
         
@@ -178,7 +184,10 @@
     });
 
 
+    // ============
     // GENERATE PDF
+    // ============
+
     bttnGenerate.addEventListener('click', async () => {
 
         console.log('Generate PDF button clicked.');
@@ -186,7 +195,11 @@
         const pdfDoc = await PDFLib.PDFDocument.create();
         console.log('PDF document created.');
 
-        // On scroll dans toutes les images
+
+        // ------------
+        // POPULATE PDF
+        // ------------
+
         for (const imageScanned of imagesScanned) {
 
             // Chope la version processed
@@ -276,17 +289,17 @@
         let c = inputCorners.imageSizeOriginal;
         let d = inputCorners.cornerPoints;
 
-        markers.topLeftCorner.style.left = `${- 10 + (b.width * d.topLeftCorner.x / c.width)}px`;
-        markers.topLeftCorner.style.top = `${- 10 + (b.height * d.topLeftCorner.y / c.height)}px`;
+        markersDIVelem.topLeftCorner.style.left = `${- 10 + (b.width * d.topLeftCorner.x / c.width)}px`;
+        markersDIVelem.topLeftCorner.style.top = `${- 10 + (b.height * d.topLeftCorner.y / c.height)}px`;
 
-        markers.topRightCorner.style.left = `${- 10 + (b.width * d.topRightCorner.x / c.width)}px`;
-        markers.topRightCorner.style.top = `${- 10 + (b.height * d.topRightCorner.y / c.height)}px`;
+        markersDIVelem.topRightCorner.style.left = `${- 10 + (b.width * d.topRightCorner.x / c.width)}px`;
+        markersDIVelem.topRightCorner.style.top = `${- 10 + (b.height * d.topRightCorner.y / c.height)}px`;
 
-        markers.bottomLeftCorner.style.left = `${- 10 + (b.width * d.bottomLeftCorner.x / c.width)}px`;
-        markers.bottomLeftCorner.style.top = `${- 10 + (b.height * d.bottomLeftCorner.y / c.height)}px`;
+        markersDIVelem.bottomLeftCorner.style.left = `${- 10 + (b.width * d.bottomLeftCorner.x / c.width)}px`;
+        markersDIVelem.bottomLeftCorner.style.top = `${- 10 + (b.height * d.bottomLeftCorner.y / c.height)}px`;
 
-        markers.bottomRightCorner.style.left = `${- 10 + (b.width * d.bottomRightCorner.x / c.width)}px`;
-        markers.bottomRightCorner.style.top = `${- 10 + (b.height * d.bottomRightCorner.y / c.height)}px`;
+        markersDIVelem.bottomRightCorner.style.left = `${- 10 + (b.width * d.bottomRightCorner.x / c.width)}px`;
+        markersDIVelem.bottomRightCorner.style.top = `${- 10 + (b.height * d.bottomRightCorner.y / c.height)}px`;
     }
 
     // Function to make markers draggable
@@ -386,6 +399,7 @@
 
 
 
+    // ======
     // HELPER
     // ======
     const ios = () => {
