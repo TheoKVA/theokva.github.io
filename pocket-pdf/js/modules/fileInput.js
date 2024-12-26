@@ -13,7 +13,9 @@ const fileInputDIV = document.getElementById('js-fileInput');
 
 
 export function handleAddBtn() {
-    fileInputDIV.click(); // Simulate a click on the file input
+    console.log('handleAddBtn()');
+    fileInputDIV.value = '';
+    fileInputDIV.click();
 };
 
 export function handleFileDragover(e) {
@@ -44,8 +46,10 @@ export function handleFileDrop(e) {
     }
 };
 
+// when click on fileinput
 export async function handleFileInput(e) {
     const files = e.target.files;
+    console.log('handleFileInput()', files);
     
     for (const file of files) {
         showLoading();

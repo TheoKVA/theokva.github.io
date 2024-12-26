@@ -41,11 +41,7 @@ export async function generatePDF() {
         // Wait for the image to load
         await new Promise((resolve) => (originalImg.onload = resolve)); 
 
-        // Prepare the canvas
-        const canvas = document.createElement('canvas');
-        const ctx = canvas.getContext('2d');
-
-        // Extract the values
+        // Extract the size values
         const dpi = pageData.imageParameters?.format?.dpi || projectSettings.format?.dpi;
         const widthMM = pageData.imageParameters?.format?.widthMM || projectSettings.format.widthMM;
         const heightMM = pageData.imageParameters?.format?.heightMM || projectSettings.format.heightMM;
@@ -82,14 +78,35 @@ export async function generatePDF() {
             heightPx = Math.round((heightMM / 25.4) * dpi);
         }
 
-        // Adjust the canvas
-        canvas.width = widthPx;
-        canvas.height = heightPx;
+        // Use scanner to extract the paper with rotation taken into account
+        const rotation = pageData.imageScaled?.rotation || 0;
 
-        // Use scanner to extract the paper
-        const extractedCanvas = scanner.extractPaper(originalImg, widthPx, heightPx, pageData.cornerPoints);
+        // Prepare canvas dimensions based on rotation
+        let finalWidthPx = widthPx;
+        let finalHeightPx = heightPx;
 
-        // Load extracted image into OpenCV
+        // Change the aspect ratio if different than 0 or 180
+        if (rotation % 180 !== 0) {
+            finalWidthPx = heightPx;
+            finalHeightPx = widthPx;
+        }
+
+        // Create a rotated canvas for extraction
+        const rotatedCanvas = document.createElement('canvas');
+        rotatedCanvas.width = finalWidthPx;
+        rotatedCanvas.height = finalHeightPx;
+        const rotatedCtx = rotatedCanvas.getContext('2d');
+
+        // Apply rotation
+        rotatedCtx.translate(rotatedCanvas.width / 2, rotatedCanvas.height / 2);
+        rotatedCtx.rotate((rotation * Math.PI) / 180);
+        rotatedCtx.drawImage(originalImg, -originalImg.width / 2, -originalImg.height / 2);
+
+        // Extract paper from the rotated canvas using scanner
+        const extractedCanvas = scanner.extractPaper(rotatedCanvas, widthPx, heightPx, pageData.cornerPoints);
+        // const extractedCanvas = scanner.extractPaper(originalImg, widthPx, heightPx, pageData.cornerPoints);
+
+        // Load extracted image into OpenCV for color correction
         const src = cv.imread(extractedCanvas);
         const dst = new cv.Mat();
         src.copyTo(dst);
@@ -97,8 +114,14 @@ export async function generatePDF() {
         // Apply levels adjustments
         applyLevelsToMat(src, dst, pageData.imageParameters.filter);
 
-        // Draw adjusted image on canvas
-        cv.imshow(canvas, dst);
+        // Prepare the canvas
+        const finalCanvas = document.createElement('canvas');
+        const ctx = finalCanvas.getContext('2d');
+        finalCanvas.width = widthPx;
+        finalCanvas.height = heightPx;
+
+        // Draw adjusted image on finalCanvas
+        cv.imshow(finalCanvas, dst);
 
         // Clean up OpenCV matrices
         src.delete();
@@ -106,7 +129,7 @@ export async function generatePDF() {
 
         // Compress the final image for the PDF
         const compression = projectSettings.compression || 0.8;
-        const imgBytes = await fetch(canvas.toDataURL('image/jpeg', compression)).then(res => res.arrayBuffer());
+        const imgBytes = await fetch(finalCanvas.toDataURL('image/jpeg', compression)).then(res => res.arrayBuffer());
 
         // Add the image to the PDF
         const pdfImage = await pdfDoc.embedJpg(imgBytes);
@@ -135,8 +158,8 @@ export async function generatePDF() {
                 try {
                     // Use the Share API
                     await navigator.share({
-                        title: "My PDF Document",
-                        text: "Here is the PDF document I generated.",
+                        title: "My PDF document",
+                        // text: "Here is the PDF document I generated.",
                         files: [file], // Share the PDF file
                     });
                     console.log("PDF shared successfully!");

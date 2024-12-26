@@ -26,7 +26,9 @@
     <p>Upload or take photos of your documents to assemble them into a PDF.</p>
 
     <button id="btn-add-image">Add image</button>
-    <input id="js-fileInput" type="file" accept="image/*" capture="environment" multiple style="display: none;">
+    <input id="js-fileInput" type="file" accept="image/*" multiple style="display: none;">
+    <!-- <input id="js-fileInput" type="file" accept="image/*" capture="environment" multiple style="display: none;"> -->
+
     <style>
         button {
             padding: 5px 10px;
@@ -82,7 +84,7 @@
 
     <!-- EXPORT Selection -->
     <div>
-        <label for="export-quality-select">Quality:</label>
+        <label for="export-quality-select">Resolution:</label>
         <select id="export-quality-select">
             <option value="100">100 dpi</option>
             <option value="200" selected>200 dpi</option>
@@ -90,11 +92,11 @@
         </select>
     </div>
     <div>
-        <label for="export-compression-select">Compression:</label>
+        <label for="export-compression-select">Quality:</label>
         <select id="export-compression-select">
-            <option value="0.9">Low</option>
+            <option value="0.5">Low</option>
             <option value="0.8" selected>Medium</option>
-            <option value="0.5">High</option>
+            <option value="0.9">High</option>
         </select>
     </div>
     <div>

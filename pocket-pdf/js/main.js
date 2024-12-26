@@ -77,8 +77,8 @@ const paperHeight = Math.round( paperHeightMM / 25.4 * paperDPI); // in PX
 // FILE INPUT
 // ==========
 
-const fileInputDIV = document.getElementById('js-fileInput'); // OK, nul part d'autre
-const addButton = document.getElementById('btn-add-image'); // OK, nul part d'autre
+const fileInputDIV = document.getElementById('js-fileInput');
+const addButton = document.getElementById('btn-add-image');
 
 // Handle drag and drop on the window
 window.addEventListener('dragover', handleFileDragover)
@@ -110,6 +110,8 @@ const rotateLeftButton = document.getElementById('rotate-left-button');
 const brightnessSlider = document.getElementById('brightness-level');
 const contrastSlider = document.getElementById('contrast-level');
 
+// In pixels
+const previewMinWidth = 500;
 
 // Function to show the overlay of the parameters for each page
 export function showParameters(inputId, inputImgSrc, inputCorners) {
@@ -139,12 +141,12 @@ export function showParameters(inputId, inputImgSrc, inputCorners) {
             const aspectRatio = img.naturalWidth / img.naturalHeight;
             if (aspectRatio > 1) {
                 // Landscape: shorter side is height
-                canvas.width = Math.round(500 * aspectRatio);
-                canvas.height = 500;
+                canvas.width = Math.round(previewMinWidth * aspectRatio);
+                canvas.height = previewMinWidth;
             } else {
                 // Portrait: shorter side is width
-                canvas.width = 500;
-                canvas.height = Math.round(500 / aspectRatio);
+                canvas.width = previewMinWidth;
+                canvas.height = Math.round(previewMinWidth / aspectRatio);
             }
 
             // Draw scaled image onto canvas

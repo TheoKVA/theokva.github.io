@@ -124,28 +124,21 @@ function handleTouchStart(e) {
     draggedCopy.style.position = 'absolute';
     draggedCopy.style.zIndex = '1000';
     draggedCopy.style.opacity = '0.5';
+
+    positionDraggedCopy(e);
 }
 
 function handleTouchMove(e) {
     e.preventDefault();
     if (!draggedCopy) return;
 
-    const touch = e.touches[0];
-
-    // Get the dimensions of the dragged copy
-    const rect = draggedCopy.getBoundingClientRect();
-    const offsetX = rect.width / 2;
-    const offsetY = rect.height / 2;
-
-    // Center the dragged copy on the touch coordinates
-    draggedCopy.style.left = `${touch.clientX - offsetX}px`;
-    draggedCopy.style.top = `${touch.clientY - offsetY}px`;
-    // draggedCopy.style.left = `${touch.clientX}px`;
-    // draggedCopy.style.top = `${touch.clientY}px`;
+    // Position element
+    positionDraggedCopy(e);
 
     // Detect target under the touch point
     // Temporarily hide the dragged copy to detect the element underneath
     draggedCopy.style.visibility = 'hidden';
+    const touch = e.touches[0];
     const targetElement = document.elementFromPoint(touch.clientX, touch.clientY)?.closest('.draggable');
     draggedCopy.style.visibility = 'visible';
 
@@ -221,6 +214,18 @@ function updateIndexes() {
             console.log('no element with id', targetId);
         }
     });
+}
+
+function positionDraggedCopy(e) {
+    if(!draggedCopy) return
+
+    const touch = e.touches[0];
+    const rect = draggedCopy.getBoundingClientRect();
+    const offsetX = rect.width / 2;
+    const offsetY = rect.height / 2;
+
+    draggedCopy.style.left = `${touch.clientX - offsetX}px`;
+    draggedCopy.style.top = `${touch.clientY - offsetY}px`;
 }
 
 // EXEMPLES
