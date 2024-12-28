@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Image to PDF</title>
+    <title>Pocket Scanner</title>
 
 
     <!-- STYLE -->
@@ -16,246 +16,296 @@
     <script src="https://docs.opencv.org/4.7.0/opencv.js" async></script>
     <script src="https://cdn.jsdelivr.net/gh/ColonelParrot/jscanify@master/src/jscanify.min.js"></script>
 
+    <!-- MOBILE DEBUG -->
+    <script src="https://cdn.jsdelivr.net/npm/eruda"></script>
+    <!-- <script>eruda.init();</script> -->
+
     <!-- SCRIPT -->
     <script type="module" src="js/main.js" defer></script>
-    
-    
-</head>
-<body>
-    <h2>Image to PDF</h2>
-    <p>Upload or take photos of your documents to assemble them into a PDF.</p>
 
-    <button id="btn-add-image">Add image</button>
+    <!-- FONT CSS -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+</head>
+
+<body>
+
+    <div class="css-page">
+
+        <div class="css-top-section">
+            <p>Pocket scanner</p>
+            <p>Upload or take photos of your documents to assemble them into a PDF.</p>
+        </div>
+
+        <div class="css-middle-section">
+            <div id="js-page-container">
+                <!-- Typical child template -->
+                <div id="js-page-template" style="display: none;" class="page">
+                    <img src="" alt="Page Preview" class="page-preview" style="width: 100px; height: 100px;">
+                    <p class="page-index"></p>
+                </div>
+            </div>
+            <button id="btn-add-image">Add image</button>
+            <style>
+                #js-page-container {
+                    border: 1px solid #ccc;
+                    padding: 10px;
+                    min-height: 100px;
+                    display: flex;
+                    flex-wrap: wrap; /* Allow pages to wrap to the next row */
+                    gap: 10px; /* Add spacing between pages */
+                }
+            
+                .page {
+                    width: 100px; /* Set fixed width */
+                    height: auto;
+                    display: flex;
+                    flex-direction: column; /* Ensure image and text are stacked */
+                    align-items: center; /* Center-align the content */
+                    text-align: center;
+                    padding: 5px;
+                    border: 1px solid #ddd; /* Optional: Add a border around each page */
+                    border-radius: 5px; /* Optional: Rounded corners */
+                    background-color: #f9f9f9; /* Optional: Light background */
+                    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Optional: Add subtle shadow */
+                    cursor: grab; /* Indicate draggable element */
+                }
+            
+                .page img.page-preview {
+                    max-width: 100%; /* Ensure image fits within the page */
+                    height: auto; /* Maintain aspect ratio */
+                    border-radius: 3px; /* Optional: Rounded corners for the image */
+                }
+            
+                .page p.page-index {
+                    margin: 5px 0 0; /* Add some spacing above the text */
+                    font-size: 12px; /* Reduce font size */
+                    color: #555; /* Optional: Light gray text color */
+                }
+            </style>
+        </div>
+
+        <div class="css-bottom-section">
+            <!-- EXPORT SECTION -->
+            <div>
+                <label for="export-quality-select">Resolution:</label>
+                <select id="export-quality-select">
+                    <option value="100">100 dpi</option>
+                    <option value="200" selected>200 dpi</option>
+                    <option value="300">300 dpi</option>
+                </select>
+            </div>
+            <div>
+                <label for="export-compression-select">Quality:</label>
+                <select id="export-compression-select">
+                    <option value="0.5">Low</option>
+                    <option value="0.8" selected>Medium</option>
+                    <option value="0.9">High</option>
+                </select>
+            </div>
+            <div>
+                <label for="export-format-select">Format:</label>
+                <select id="export-format-select">
+                    <option value="A3" data-width="297" data-height="420">A3</option>
+                    <option value="A4" data-width="210" data-height="297" selected>A4</option>
+                    <option value="A5" data-width="148" data-height="210">A5</option>
+                    <option value="Receipt" data-width="60" data-height="auto">Receipt</option>
+                    <option value="Cards" data-width="130" data-height="auto">Cards</option>
+                </select>
+            </div>
+
+            <div>
+                <div id="btn-generate-pdf" class="my-button my-button-27px my-button-blue">
+                    <p>Generate PDF</p>
+                </div>
+                <div id="btn-download-pdf" class="my-button my-button-27px my-button-black" disabled>
+                    <p>Download PDF</p>
+                </div>
+            </div>
+            
+        </div>
+
+        <div class="css-footer-section">
+            <p>Coded with ❤️ by Theo Francart</p>
+            <p>Github</p>
+        </div>
+    </div>
+
+    <!-- Hidden file input -->
     <input id="js-fileInput" type="file" accept="image/*" multiple style="display: none;">
     <!-- <input id="js-fileInput" type="file" accept="image/*" capture="environment" multiple style="display: none;"> -->
 
-    <style>
-        button {
-            padding: 5px 10px;
-            font-size: 16px;
-            cursor: pointer;
-        }
-    </style>
 
-    <div id="js-page-container">
-        <!-- Typical child template -->
-        <div id="js-page-template" style="display: none;" class="page">
-            <img src="" alt="Page Preview" class="page-preview" style="width: 100px; height: 100px;">
-            <p class="page-index"></p>
-        </div>
-        <style>
-            #js-page-container {
-                border: 1px solid #ccc;
-                padding: 10px;
-                min-height: 100px;
-                display: flex;
-                flex-wrap: wrap; /* Allow pages to wrap to the next row */
-                gap: 10px; /* Add spacing between pages */
-            }
-        
-            .page {
-                width: 100px; /* Set fixed width */
-                height: auto;
-                display: flex;
-                flex-direction: column; /* Ensure image and text are stacked */
-                align-items: center; /* Center-align the content */
-                text-align: center;
-                padding: 5px;
-                border: 1px solid #ddd; /* Optional: Add a border around each page */
-                border-radius: 5px; /* Optional: Rounded corners */
-                background-color: #f9f9f9; /* Optional: Light background */
-                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Optional: Add subtle shadow */
-                cursor: grab; /* Indicate draggable element */
-            }
-        
-            .page img.page-preview {
-                max-width: 100%; /* Ensure image fits within the page */
-                height: auto; /* Maintain aspect ratio */
-                border-radius: 3px; /* Optional: Rounded corners for the image */
-            }
-        
-            .page p.page-index {
-                margin: 5px 0 0; /* Add some spacing above the text */
-                font-size: 12px; /* Reduce font size */
-                color: #555; /* Optional: Light gray text color */
-            }
-        </style>
-    </div>
-
-    <!-- EXPORT Selection -->
-    <div>
-        <label for="export-quality-select">Resolution:</label>
-        <select id="export-quality-select">
-            <option value="100">100 dpi</option>
-            <option value="200" selected>200 dpi</option>
-            <option value="300">300 dpi</option>
-        </select>
-    </div>
-    <div>
-        <label for="export-compression-select">Quality:</label>
-        <select id="export-compression-select">
-            <option value="0.5">Low</option>
-            <option value="0.8" selected>Medium</option>
-            <option value="0.9">High</option>
-        </select>
-    </div>
-    <div>
-        <label for="export-format-select">Format:</label>
-        <select id="export-format-select">
-            <option value="A3" data-width="297" data-height="420">A3</option>
-            <option value="A4" data-width="210" data-height="297" selected>A4</option>
-            <option value="A5" data-width="148" data-height="210">A5</option>
-            <option value="Receipt" data-width="60" data-height="auto">Receipt</option>
-            <option value="Cards" data-width="130" data-height="auto">Cards</option>
-        </select>
-    </div>
     
-    <button id="btn-generate-pdf">Generate PDF</button>
-    <button id="btn-download-pdf" disabled>Download PDF</button>
 
-    <!-- CORNER SELECTION OVERLAY -->
+
+    <!-- PARAMETER OVERLAY -->
+    <!-- outside -->
     <div id="parameters-container">
+
+        <!-- Static Background -->
+        <div id="parameters-background"></div>
+
+        <!-- inside -->
         <div id="adjustment-container">
 
-            <button id="rotate-left-button">Rotate Left</button>
-            <button id="rotate-right-button">Rotate Right</button>
-            <button id="delete-button" style="background-color: #ffbdbd87;">Delete</button>
+            <!-- Top section -->
+            <div class="css-action-section" style="gap: 5px;">
+                <!-- Rotate -->
+                <div id="rotate-left-button" class="my-button my-button-square-22px my-button-white">
+                    <svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="-0.5" y="0.5" width="8" height="9" transform="matrix(-1 0 0 1 17 8)" fill="#B3B3B3" stroke="#B3B3B3"/>
+                        <path d="M2 11H8L5 15L2 11Z" fill="#B3B3B3"/>
+                        <path d="M13 3C13.5523 3 14 3.44772 14 4C14 4.55228 13.5523 5 13 5V3ZM13 5C11.5169 5 10.3388 5.06275 9.39764 5.23387C8.46037 5.40428 7.82464 5.67091 7.3747 6.03087C6.51264 6.72051 6 8.03546 6 11H4C4 7.96454 4.48736 5.77949 6.1253 4.46913C6.92536 3.82909 7.91463 3.47072 9.03986 3.26613C10.1612 3.06225 11.4831 3 13 3V5Z" fill="#B3B3B3"/>
+                    </svg>                        
+                </div>
+                <div id="rotate-right-button" class="my-button my-button-square-22px my-button-white">
+                    <svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="4.5" y="8.5" width="8" height="9" fill="#B3B3B3" stroke="#B3B3B3"/>
+                        <path d="M20 11H14L17 15L20 11Z" fill="#B3B3B3"/>
+                        <path d="M9 3C8.44772 3 8 3.44772 8 4C8 4.55228 8.44772 5 9 5V3ZM9 5C10.4831 5 11.6612 5.06275 12.6024 5.23387C13.5396 5.40428 14.1754 5.67091 14.6253 6.03087C15.4874 6.72051 16 8.03546 16 11H18C18 7.96454 17.5126 5.77949 15.8747 4.46913C15.0746 3.82909 14.0854 3.47072 12.9601 3.26613C11.8388 3.06225 10.5169 3 9 3V5Z" fill="#B3B3B3"/>
+                    </svg>
+                </div>
+
+                <!-- Format Selection -->
+                <div style="display:none;">
+                    <label for="format-select">Format:</label>
+                    <select id="format-select">
+                        <option value="A3">A3</option>
+                        <option value="A4" selected>A4</option>
+                        <option value="A5">A5</option>
+                        <option value="Letter">Letter</option>
+                        <option value="Receipt">Receipt</option>
+                        <option value="Custom">Custom</option>
+                    </select>
+                </div>
+            </div>
 
             <!-- Image and Corner Adjustment -->
-            <div id="image-container" style="position: relative; display: inline-block; width: 100%; margin: 20px 0px;">
-                <img id="input-image" src="" alt="Loaded Image" style="max-width: 100%; max-height: 500px; display: block;">
+            <div id="image-container">
+                <!-- Image bg -->
+                <img id="input-image" src="https://via.placeholder.com/720x1080/eee?" alt="Loaded Image">
+                <!-- corners -->
                 <div id="top-left-corner" class="corner-marker" style="background-color:red;"></div>
                 <div id="top-right-corner" class="corner-marker"></div>
                 <div id="bottom-left-corner" class="corner-marker"></div>
                 <div id="bottom-right-corner" class="corner-marker"></div>
+                <!-- edges -->
+                <div id="highlight-container">
+                    <svg id="highlight-svg">
+                        <polygon id="highlight-polygon"></polygon>
+                    </svg>
+                </div>
             </div>
             
-            <!-- Format Selection -->
-            <div style="margin-bottom: 20px; display:none;">
-                <label for="format-select">Format:</label>
-                <select id="format-select">
-                    <option value="A3">A3</option>
-                    <option value="A4" selected>A4</option>
-                    <option value="A5">A5</option>
-                    <option value="Letter">Letter</option>
-                    <option value="Receipt">Receipt</option>
-                    <option value="Custom">Custom</option>
-                </select>
+            <!-- Color style element -->
+            <div id="js-grayscale" class="my-toggle" style="--option-count: 3;">
+                <div class="my-toggle-option active" data-option="color">Color</div>
+                <div class="my-toggle-option" data-option="grayscale">Grayscale</div>
+                <div class="my-toggle-option" data-option="black-white">Black & White</div>
+                <div class="my-toggle-background"></div>
             </div>
-            
-            <!-- Orientation Selection -->
-            <div style="margin-bottom: 20px; display:none;">
-                <label>Orientation:</label><br>
-                <label><input type="radio" name="orientation" value="vertical" checked> Vertical</label>
-                <label><input type="radio" name="orientation" value="horizontal"> Horizontal</label>
+
+            <!-- Slider 1 -->
+            <div class="my-slider" style="display: none;">
+                <p class="my-slider-label">Description</p>
+                <input type="range" min="0" max="100" value="50" oninput="this.nextElementSibling.innerText = this.value">
+                <p class="my-slider-value">10</p>
             </div>
-            
-            
+
             <!-- Color Levels Adjustment -->
-            <div style="margin-bottom: 20px;">
-                <div>
-                    <input id="black-level" type="range" min="0" max="255" value="15">
+            <div>
+                <div class="my-slider">
+                    <p class="my-slider-label">Black levels:</p>
+                    <input id="black-level" type="range" min="0" max="255" value="15" oninput="this.nextElementSibling.innerText = this.value">
+                    <p class="my-slider-value">15</p>
                 </div>
-                <div>
-                    <input id="middle-level" type="range" min="0.05" max="1" step="0.05" value="0.3">
+                <div class="my-slider">
+                    <p class="my-slider-label">Middle levels:</p>
+                    <input id="middle-level" type="range" min="0.05" max="1" step="0.05" value="0.3" oninput="this.nextElementSibling.innerText = this.value">
+                    <p class="my-slider-value">0.3</p>
                 </div>
-                <div>
-                    <input id="white-level" type="range" min="0" max="255" value="240">
+                <div class="my-slider">
+                    <p class="my-slider-label">White levels:</p>
+                    <input id="white-level" type="range" min="0" max="255" value="240" oninput="this.nextElementSibling.innerText = this.value">
+                    <p class="my-slider-value">240</p>
                 </div>
             </div>
-
-            <!-- Black and White element -->
-            <label for="grayscale-checkbox">
-                <input type="checkbox" id="grayscale-checkbox">
-                BW
-            </label>
-
-            <!-- Action Buttons -->
-            <button id="confirm-button">OK</button>
-            <button id="cancel-button">Cancel</button>
+            
+            <!-- Action Section -->
+            <div class="css-action-section flex-row" style="margin-top: 15px;">
+                <div id="delete-button" class="my-button my-button-27px my-button-white" style="width: 80px; color:#FF7F78;">
+                    <p>Delete</p>
+                </div>
+                <div style="flex:1"></div>
+                <div id="cancel-button" class="my-button my-button-27px my-button-white" style="width: 80px;">
+                    <p>Cancel</p>
+                </div>
+                <div id="confirm-button" class="my-button my-button-27px my-button-blue" style="width: 80px;">
+                    <p>Save</p>
+                </div>
+            </div>
         </div>
-        
-        <style>
-            #parameters-container {
-                display: none;
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                background-color: rgba(0, 0, 0, 0.8);
-                z-index: 9998;
-                overflow-y: auto; /* Enable vertical scrolling */
-                align-items: flex-start; /* Align content to the top */
-                justify-content: center;
-                /* padding: 20px; Add padding for better appearance */
-            }
-
-            #adjustment-container {
-                position: relative;
-                width: 90%;
-                max-width: 500px;
-                background-color: white;
-                padding: 20px;
-                border-radius: 10px;
-                text-align: center;
-                margin: auto; /* Center the adjustment container */
-            }
-            .corner-marker {
-                position: absolute;
-                width: 20px;
-                height: 20px;
-                background-color: rgba(0, 255, 221, 0.71);
-                border-radius: 50%;
-                cursor: pointer;
-                touch-action: none; /* Prevent scrolling during touch */
-            }
-        </style>
     </div>
 
     <!-- LOADING OVERLAY -->
-    <div id="loading-overlay" style="display: none;">
+    <div id="loading-overlay">
         <div class="loading-circle"></div>
-        <style>
-            #loading-overlay {
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                background-color: rgba(0, 0, 0, 0.6);
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                z-index: 9999;
-            }
-        
-            .loading-circle {
-                width: 40px;
-                height: 40px;
-                border: 3px solid rgba(255, 255, 255, 0.4);
-                border-top-color: white;
-                border-radius: 50%;
-                animation: spin 1.5s linear infinite;
-            }
-        
-            @keyframes spin {
-                from {
-                    transform: rotate(0deg);
-                }
-                to {
-                    transform: rotate(360deg);
-                }
-            }
-        </style>
     </div>
     
     
     
 </body>
 
-<script>
-    // 
+<script defer>
+    document.querySelectorAll('.my-toggle').forEach((toggleContainer) => {
+        const toggleOptions = toggleContainer.querySelectorAll('.my-toggle-option');
+        const toggleBackground = toggleContainer.querySelector('.my-toggle-background');
+
+        // Initialize the state based on the currently active option
+        const initialActive = toggleContainer.querySelector('.my-toggle-option.active');
+        if (initialActive) {
+            toggleContainer.dataset.activeOption = initialActive.dataset.option;
+        }
+
+        // Event listener for each option
+        toggleOptions.forEach((option, index) => {
+            option.addEventListener('click', () => {
+                // Remove the active class from all options
+                toggleOptions.forEach(opt => opt.classList.remove('active'));
+                // Add the active class to the clicked option
+                option.classList.add('active');
+                // Slide the highlight background
+                toggleBackground.style.left = `${index * 100 / toggleOptions.length}%`;
+                // Update the data attribute with the new active option
+                toggleContainer.dataset.activeOption = option.dataset.option;
+            });
+        });
+    });
+
+    // Example usage
+    // const toggleContainer = document.getElementById('my-toggle-container');
+    // setToggleState(toggleContainer, 'Color'); // Set the state to "Color"
+    function setToggleState(container, state) {
+        // Update the `data-state` attribute of the container
+        container.dataset.activeOption = state;
+
+        // Get all options in the toggle
+        const allOptions = container.querySelectorAll('.my-toggle-option');
+        const toggleBackground = container.querySelector('.my-toggle-background');
+
+        // Loop through options to update their active class
+        allOptions.forEach((option, index) => {
+            if (option.dataset.option === state) {
+                option.classList.add('active');
+                // Update the background position
+                toggleBackground.style.left = `${index * 100 / allOptions.length}%`;
+            } else {
+                option.classList.remove('active');
+            }
+        });
+    }
 </script>
+
 
 </html>

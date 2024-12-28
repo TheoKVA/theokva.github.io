@@ -95,6 +95,7 @@ addButton.addEventListener('click', handleAddBtn)
 
 // HTML elements
 const parametersContainer = document.getElementById('parameters-container');
+const parametersImageContainer  = parametersContainer.querySelector('#image-container');
 const parametersInputImage = parametersContainer.querySelector('#input-image');
 const parametersMarkers = {
     topLeftCorner: document.getElementById('top-left-corner'),
@@ -102,6 +103,10 @@ const parametersMarkers = {
     bottomLeftCorner: document.getElementById('bottom-left-corner'),
     bottomRightCorner: document.getElementById('bottom-right-corner'),
 };
+// Pre-declare variables outside the function
+const parameterHighlightPolygon = document.getElementById('highlight-polygon');
+const parameterHighlightSVG = document.getElementById('highlight-svg');
+const parameterEdge = document.getElementById('square-edges');
 const parametersConfirmButton = document.getElementById('confirm-button');
 const parametersCancelButton = document.getElementById('cancel-button');
 const parametersDeleteButton = document.getElementById('delete-button');
@@ -205,11 +210,12 @@ function handleParametersLoaded() {
     parametersContainer.style.display = 'flex';
 
     // Update scaled dimensions
-    const rect = parametersInputImage.getBoundingClientRect();
-    tempEntrie.imageScaled.width = rect.width;
-    tempEntrie.imageScaled.height = rect.height;
-    tempEntrie.imageScaled.top = rect.top;
-    tempEntrie.imageScaled.left = rect.left;
+    // const rect = parametersInputImage.getBoundingClientRect();
+    // console.log('    rect', rect);
+    // tempEntrie.imageScaled.width = rect.width;
+    // tempEntrie.imageScaled.height = rect.height;
+    // tempEntrie.imageScaled.top = rect.top;
+    // tempEntrie.imageScaled.left = rect.left;
 
     // Niveaux etc
     updateParameters()
@@ -229,49 +235,99 @@ function updateParameters() {
 
 // Function to position markers based on corner points
 function positionMarkers() {
+
+    if(!tempEntrie?.imageScaled?.width) return
+
     console.log('positionMarkers()');
+
+    // Update scaled dimensions and coordinates
+    const rect_inside = parametersInputImage.getBoundingClientRect();
+    const rect_outside = parametersImageContainer.getBoundingClientRect();
+    tempEntrie.imageScaled.width = rect_inside.width;
+    tempEntrie.imageScaled.height = rect_inside.height;
+    tempEntrie.imageScaled.containerTop = rect_outside.top;
+    tempEntrie.imageScaled.containerLeft = rect_outside.left;
+    tempEntrie.imageScaled.top = rect_inside.top - rect_outside.top - 1; // -1 border
+    tempEntrie.imageScaled.left = rect_inside.left - rect_outside.left -1; // -1 border
 
     let a = tempEntrie;
     let b = tempEntrie.imageScaled;
     let c = tempEntrie.imageOriginal;
     let d = tempEntrie.cornerPoints;
 
-    parametersMarkers.topLeftCorner.style.left = `${- 10 + (b.width * d.topLeftCorner.x / c.width)}px`;
-    parametersMarkers.topLeftCorner.style.top = `${- 10 + (b.height * d.topLeftCorner.y / c.height)}px`;
+    parametersMarkers.topLeftCorner.style.left = `${- 8 + b.left + (b.width * d.topLeftCorner.x / c.width)}px`;
+    parametersMarkers.topLeftCorner.style.top = `${- 8 + b.top + (b.height * d.topLeftCorner.y / c.height)}px`;
 
-    parametersMarkers.topRightCorner.style.left = `${- 10 + (b.width * d.topRightCorner.x / c.width)}px`;
-    parametersMarkers.topRightCorner.style.top = `${- 10 + (b.height * d.topRightCorner.y / c.height)}px`;
+    parametersMarkers.topRightCorner.style.left = `${- 8 + b.left + (b.width * d.topRightCorner.x / c.width)}px`;
+    parametersMarkers.topRightCorner.style.top = `${- 8 + b.top + (b.height * d.topRightCorner.y / c.height)}px`;
 
-    parametersMarkers.bottomLeftCorner.style.left = `${- 10 + (b.width * d.bottomLeftCorner.x / c.width)}px`;
-    parametersMarkers.bottomLeftCorner.style.top = `${- 10 + (b.height * d.bottomLeftCorner.y / c.height)}px`;
+    parametersMarkers.bottomLeftCorner.style.left = `${- 8 + b.left + (b.width * d.bottomLeftCorner.x / c.width)}px`;
+    parametersMarkers.bottomLeftCorner.style.top = `${- 8 + b.top + (b.height * d.bottomLeftCorner.y / c.height)}px`;
 
-    parametersMarkers.bottomRightCorner.style.left = `${- 10 + (b.width * d.bottomRightCorner.x / c.width)}px`;
-    parametersMarkers.bottomRightCorner.style.top = `${- 10 + (b.height * d.bottomRightCorner.y / c.height)}px`;
+    parametersMarkers.bottomRightCorner.style.left = `${- 8 + b.left + (b.width * d.bottomRightCorner.x / c.width)}px`;
+    parametersMarkers.bottomRightCorner.style.top = `${- 8 + b.top + (b.height * d.bottomRightCorner.y / c.height)}px`;
+ 
+    updateEdges();
+}
+
+function updateEdges() {
+    // console.log('updateEdges()');
+
+    // Calculate normalized positions for the polygon points
+    const topLeftX = parseFloat(parametersMarkers.topLeftCorner.style.left) + 8;
+    const topLeftY = parseFloat(parametersMarkers.topLeftCorner.style.top) + 8;
+
+    const topRightX = parseFloat(parametersMarkers.topRightCorner.style.left) + 8;
+    const topRightY = parseFloat(parametersMarkers.topRightCorner.style.top) + 8;
+
+    const bottomLeftX = parseFloat(parametersMarkers.bottomLeftCorner.style.left) + 8;
+    const bottomLeftY = parseFloat(parametersMarkers.bottomLeftCorner.style.top) + 8;
+
+    const bottomRightX = parseFloat(parametersMarkers.bottomRightCorner.style.left) + 8;
+    const bottomRightY = parseFloat(parametersMarkers.bottomRightCorner.style.top) + 8;
+
+    // Update the polygon's points
+    const points = `
+        ${topLeftX},${topLeftY} 
+        ${topRightX},${topRightY} 
+        ${bottomRightX},${bottomRightY} 
+        ${bottomLeftX},${bottomLeftY}
+    `;
+    parameterHighlightPolygon.setAttribute('points', points);
 }
 
 // Function to make markers draggable (only once)
 function makeMarkersDraggable(marker, cornerKey) {
     const markerOffset = { x: -30, y: -30 }; // Finger offset
+    const markerOffset_test = { x: 0, y: 0 }; // Finger offset
 
-    const moveAt = (x, y) => {
+    const moveMarkerAt = (x, y) => {
+        console.log('moveMarkerAt()');
+        // Grab the data
         let a = tempEntrie;
         let b = tempEntrie.imageScaled;
         let c = tempEntrie.imageOriginal;
+
         // Update the UI
-        marker.style.left = `${Math.max(-10, x - 10 - b.left)}px`;
-        marker.style.top = `${Math.max(-10, y - 10 - b.top)}px`;
+        marker.style.left = `${Math.max(-8, x - 8 - b.containerLeft)}px`;
+        marker.style.top = `${Math.max(-8, y - 8 - b.containerTop)}px`;
+        // marker.style.top = `${Math.max(-8, y - b.top)}px`;
+
+        // refaire la trad !
         a.cornerPoints[cornerKey] = {
-            x: c.width * (x - b.left) / b.width, 
-            y: c.height * (y - b.top) / b.height
+            x: c.width * (x - b.containerLeft - b.left ) / b.width, 
+            y: c.height * (y - b.containerTop - b.top ) / b.height
         };
+
+        updateEdges();
         // on indique un changement
         tempEntrie.changeOccured = true;
     };
 
-    const onMouseMove = (e) => moveAt(e.clientX, e.clientY);
+    const onMouseMove = (e) => moveMarkerAt(e.clientX, e.clientY);
     const onTouchMove = (e) => {
         const touch = e.touches[0];
-        moveAt(touch.clientX + markerOffset.x, touch.clientY + markerOffset.y);
+        moveMarkerAt(touch.clientX + markerOffset.x, touch.clientY + markerOffset.y);
     };
 
     // Mouse events
@@ -288,7 +344,7 @@ function makeMarkersDraggable(marker, cornerKey) {
     marker.addEventListener('touchstart', (e) => {
         e.preventDefault();
         const touch = e.touches[0];
-        moveAt(touch.clientX + markerOffset.x, touch.clientY + markerOffset.y); // Set initial position
+        moveMarkerAt(touch.clientX + markerOffset.x, touch.clientY + markerOffset.y); // Set initial position
         document.addEventListener('touchmove', onTouchMove);
         document.addEventListener('touchend', () => {
             document.removeEventListener('touchmove', onTouchMove);
@@ -519,23 +575,32 @@ function rotateImage(degrees) {
 
             // Position the UI markers
             positionMarkers();
+
+            // Apply again the Levels
+            // applyLevelsWithOpenCV();
         };
     };
 }
 
-
-
+// WINDOW RESIZE
+window.addEventListener('resize', handleResize);
+function handleResize() {
+    console.log("Window resized: ", window.innerWidth, "x", window.innerHeight);
+    positionMarkers()
+}
 
 // LEVELS
 const blackSlider = document.getElementById('black-level');
 const middleSlider = document.getElementById('middle-level');
 const whiteSlider = document.getElementById('white-level');
-const grayscaleCheckbox = document.getElementById('grayscale-checkbox');
+// const grayscaleState = document.getElementById('grayscale-tmp');
+const grayscaleState = document.getElementById('js-grayscale');
+
 
 blackSlider.addEventListener('input', applyLevelsWithOpenCV);
 middleSlider.addEventListener('input', applyLevelsWithOpenCV);
 whiteSlider.addEventListener('input', applyLevelsWithOpenCV);
-grayscaleCheckbox.addEventListener('change', applyLevelsWithOpenCV);
+grayscaleState.addEventListener('click', applyLevelsWithOpenCV);
 
 let src, dst, originalCanvas, ctx;
 let CV_isSet = false;
@@ -543,6 +608,9 @@ let CV_isSet = false;
 // Initialize the canvas and OpenCV matrices
 function initializeLevels() {
     console.log('initializeLevels()');
+
+    // Indicate a change
+    if(!tempEntrie.changeOccured) tempEntrie.changeOccured = true
 
     // Retrieve the target canvas
     originalCanvas = tempEntrie.imageScaled.canvas;
@@ -556,7 +624,14 @@ function initializeLevels() {
     blackSlider.value = tempEntrie.imageParameters.filter.black;
     middleSlider.value = tempEntrie.imageParameters.filter.middle;
     whiteSlider.value = tempEntrie.imageParameters.filter.white;
-    grayscaleCheckbox.checked = tempEntrie.imageParameters.filter.grayscale;
+    // grayscaleState.checked = tempEntrie.imageParameters.filter.grayscale;
+
+    // Set the toggle state based on an external value
+    if (tempEntrie.imageParameters.filter.grayscale) {
+        setToggleState(grayscaleState, 'grayscale');
+    } else {
+        setToggleState(grayscaleState, 'color');
+    }
 
     // We save
     CV_isSet = true;
@@ -569,6 +644,11 @@ function initializeLevels() {
 function applyLevelsWithOpenCV() {
     console.log('applyLevelsWithOpenCV()');
 
+    if(!src) {
+        console.log('   > "src" not defined, return')
+        return
+    }
+
     if (!CV_isSet) {
         CV_isSet = true;
         initializeLevels();
@@ -578,14 +658,18 @@ function applyLevelsWithOpenCV() {
     const black = parseInt(blackSlider.value, 10);
     const white = parseInt(whiteSlider.value, 10);
     const middle = parseFloat(middleSlider.value);
-    const grayscale = grayscaleCheckbox.checked;
+    const grayscale = grayscaleState.dataset.activeOption == 'grayscale';
+
+    // Start with the original source matrix
+    let workingMat = new cv.Mat();
+    src.copyTo(workingMat); // Copy the original src matrix
 
     // If grayscale is enabled, convert the source to grayscale
     let graySrc = null;
     if (grayscale) {
         graySrc = new cv.Mat();
-        cv.cvtColor(src, graySrc, cv.COLOR_RGBA2GRAY, 0); // Convert to grayscale
-        cv.cvtColor(graySrc, src, cv.COLOR_GRAY2RGBA, 0); // Back to RGBA
+        cv.cvtColor(workingMat, graySrc, cv.COLOR_RGBA2GRAY, 0); // Convert to grayscale
+        cv.cvtColor(graySrc, workingMat, cv.COLOR_GRAY2RGBA, 0); // Back to RGBA
         graySrc.delete();
     }
 
@@ -599,7 +683,7 @@ function applyLevelsWithOpenCV() {
     }
 
     // Apply the LUT to each pixel
-    const srcData = src.data;
+    const srcData = workingMat.data;
     const dstData = dst.data;
     for (let i = 0; i < srcData.length; i++) {
         dstData[i] = lut[srcData[i]];

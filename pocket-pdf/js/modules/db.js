@@ -35,6 +35,8 @@ export const defaultEntrie = {
         'canvas': null,
         'scaleFactor': -1,
         'rotation': 0,
+        'containerTop': -1,
+        'containerLeft': -1,
         'top': -1,
         'left': -1,
         'width': -1,

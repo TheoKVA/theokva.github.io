@@ -14,6 +14,14 @@ const qualitySelect = document.getElementById('export-quality-select');
 const compressionSelect = document.getElementById('export-compression-select');
 const formatSelect = document.getElementById('export-format-select');
 
+// Make download link
+const downloadLink = document.createElement('a');
+downloadLink.style = 'display: none'; // Invisible link
+document.body.appendChild(downloadLink);
+downloadPdfButton.addEventListener("click", function () {
+    downloadLink.click(); // Trigger the download
+});
+
 // --------
 //   MAIN
 // --------
@@ -82,29 +90,29 @@ export async function generatePDF() {
         const rotation = pageData.imageScaled?.rotation || 0;
 
         // Prepare canvas dimensions based on rotation
-        let finalWidthPx = widthPx;
-        let finalHeightPx = heightPx;
+        let finalImageWidth = originalImg.width;
+        let finalImageHeight = originalImg.height;
 
         // Change the aspect ratio if different than 0 or 180
         if (rotation % 180 !== 0) {
-            finalWidthPx = heightPx;
-            finalHeightPx = widthPx;
+            finalImageWidth = originalImg.height;
+            finalImageHeight = originalImg.width;
         }
 
         // Create a rotated canvas for extraction
         const rotatedCanvas = document.createElement('canvas');
-        rotatedCanvas.width = finalWidthPx;
-        rotatedCanvas.height = finalHeightPx;
+        rotatedCanvas.width = finalImageWidth;
+        rotatedCanvas.height = finalImageHeight;
         const rotatedCtx = rotatedCanvas.getContext('2d');
 
         // Apply rotation
         rotatedCtx.translate(rotatedCanvas.width / 2, rotatedCanvas.height / 2);
         rotatedCtx.rotate((rotation * Math.PI) / 180);
         rotatedCtx.drawImage(originalImg, -originalImg.width / 2, -originalImg.height / 2);
-
+        
         // Extract paper from the rotated canvas using scanner
+        // const extractedCanvas = scanner.extractPaper(rotatedCanvas, widthPx, heightPx, pageData.cornerPoints);
         const extractedCanvas = scanner.extractPaper(rotatedCanvas, widthPx, heightPx, pageData.cornerPoints);
-        // const extractedCanvas = scanner.extractPaper(originalImg, widthPx, heightPx, pageData.cornerPoints);
 
         // Load extracted image into OpenCV for color correction
         const src = cv.imread(extractedCanvas);
@@ -140,13 +148,23 @@ export async function generatePDF() {
             width: pdfImage.width,
             height: pdfImage.height,
         });
+
+        // Log
         console.log('Image drawn on PDF page.');
     }
 
-    const pdfBytes = await pdfDoc.save(); // Save as raw bytes
+    // Save as raw bytes
+    const pdfBytes = await pdfDoc.save();
     const blob = new Blob([pdfBytes], { type: 'application/pdf' });
-    downloadPdfButton.disabled = false; // Enable the button
 
+    // Prepare download
+    downloadLink.href = URL.createObjectURL(blob);
+    downloadLink.download = 'document.pdf';
+
+    // Enable the download button
+    downloadPdfButton.disabled = false;
+
+    // Remove the loading element
     hideLoading();
 
     // iOS-specific handling
@@ -169,24 +187,11 @@ export async function generatePDF() {
             });
         } 
         else {
-            const downloadLinkIOS = document.createElement('a');
-            downloadLinkIOS.href = URL.createObjectURL(blob);
-            downloadLinkIOS.download = 'document.pdf';
-            downloadLinkIOS.style = 'display: none'; // Invisible link
-
-            // Append and prepare for manual trigger
-            document.body.appendChild(downloadLinkIOS);
-            downloadPdfButton.addEventListener("click", function () {
-                downloadLinkIOS.click(); // Trigger the download
-            });
+            // ok
         }
     } else {
         // Handling for other platforms
         const blobUrl = URL.createObjectURL(blob);
-
-        // Update download button
-        downloadPdfButton.href = blobUrl;
-        downloadPdfButton.download = 'document.pdf';
 
         // Try to open in a new tab (optional fallback)
         const pdfWindow = window.open(blobUrl);
