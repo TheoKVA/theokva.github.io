@@ -141,6 +141,7 @@ export async function generatePDF() {
 
         // Add the image to the PDF
         const pdfImage = await pdfDoc.embedJpg(imgBytes);
+        // const pdfImage = await pdfDoc.embedPng(imgBytes); // For PNG image
         const page = pdfDoc.addPage([widthPx, heightPx]);
         page.drawImage(pdfImage, {
             x: 0,
@@ -156,6 +157,12 @@ export async function generatePDF() {
     // Save as raw bytes
     const pdfBytes = await pdfDoc.save();
     const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+
+    // Print PDF size in MB
+    const pdfSizeBytes = blob.size;
+    const pdfSizeKB = (blob.size / 1024).toFixed(2);
+    const pdfSizeMB = (blob.size / (1024 * 1024)).toFixed(2);
+    console.log(`    > PDF Size: ${pdfSizeMB} MB`);
 
     // Prepare download
     downloadLink.href = URL.createObjectURL(blob);

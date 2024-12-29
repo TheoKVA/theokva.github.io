@@ -229,6 +229,9 @@ function positionDraggedCopy(e) {
 }
 
 // EXEMPLES
-// pageContainer.appendChild(createPageElement(0, 'abc', 'https://via.placeholder.com/100'));
-// pageContainer.appendChild(createPageElement(1, 'def', 'https://via.placeholder.com/100/0000FF'));
-// pageContainer.appendChild(createPageElement(2, 'ghi', 'https://via.placeholder.com/100/FF0000'));
+pageContainer.appendChild(createPageElement(0, 'abc', 'https://via.placeholder.com/100'));
+pageContainer.appendChild(createPageElement(1, 'def', 'https://via.placeholder.com/100/0000FF'));
+pageContainer.appendChild(createPageElement(2, 'ghi', 'https://via.placeholder.com/100/FF0000'));
+pageContainer.appendChild(createPageElement(3, 'abc', 'https://via.placeholder.com/100'));
+pageContainer.appendChild(createPageElement(4, 'def', 'https://via.placeholder.com/100/0000FF'));
+pageContainer.appendChild(createPageElement(5, 'ghi', 'https://via.placeholder.com/100/FF0000'));

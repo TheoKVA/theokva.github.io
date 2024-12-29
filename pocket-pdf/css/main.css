@@ -12,6 +12,7 @@
 /* section */
 @import "sectionParameter.css";
 @import "sectionLoading.css";
+@import "sectionFooter.css";
 
 
 /* ==================== */
@@ -58,8 +59,8 @@ body {
     overflow-y: hidden;
     /* style */
     background-color: var(--page-background-color);
-    /* padding: 10px;
-     */
+
+    /* padding: 10px; */
 }
 
 .css-page > * {

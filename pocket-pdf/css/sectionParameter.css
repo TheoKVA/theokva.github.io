@@ -1,7 +1,7 @@
 /* OUTSIDE */
 #parameters-container {
     /* position */
-    display: flex; /* none / flex */
+    display: none; /* none / flex */
     position: fixed;
     z-index: 9998; /* below loading */
     top: 0;
