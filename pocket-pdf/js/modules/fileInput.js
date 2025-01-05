@@ -1,7 +1,3 @@
-// ==========
-// FILE INPUT
-// ==========
-
 // IMPORTS
 import { showLoading } from './loading.js';
 import { scanner } from './externalLib.js'
@@ -10,19 +6,20 @@ import { showParameters } from '../main.js'
 // HTML
 const fileInputDIV = document.getElementById('js-fileInput');
 
+// - - - - - - - - - - - - - - -
 
-
+// BUTTON
 export function handleAddBtn() {
     console.log('handleAddBtn()');
     fileInputDIV.value = '';
     fileInputDIV.click();
 };
 
+// DRAG-DROP
 export function handleFileDragover(e) {
     e.preventDefault(); // Prevent default behavior (e.g., open file in browser)
     e.dataTransfer.dropEffect = 'copy'; // Indicate that a copy is expected
 };
-
 export function handleFileDrop(e) {
     e.preventDefault(); // Prevent default behavior
     const files = e.dataTransfer.files;
@@ -46,7 +43,7 @@ export function handleFileDrop(e) {
     }
 };
 
-// when click on fileinput
+// CLICK ON FILEINPUT
 export async function handleFileInput(e) {
     const files = e.target.files;
     console.log('handleFileInput()', files);

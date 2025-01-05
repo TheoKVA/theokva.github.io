@@ -93,8 +93,8 @@ addButton.addEventListener('click', handleAddBtn)
 // IMAGE PARAMETERS
 // ================
 
-// HTML elements
-const parametersContainer = document.getElementById('parameters-container');
+// HTML
+const parametersContainer = document.getElementById('parameters-overlay');
 const parametersImageContainer  = parametersContainer.querySelector('#image-container');
 const parametersInputImage = parametersContainer.querySelector('#input-image');
 const parametersMarkers = {

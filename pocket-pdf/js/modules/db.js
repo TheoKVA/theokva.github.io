@@ -1,3 +1,6 @@
+
+// - - - - - - - - - - - - - - -
+
 // Shared database array
 export const db = []; 
 
@@ -56,9 +59,7 @@ export let projectSettings = {
 }
 
 
-// =======
 // HELPERS
-// =======
 
 // Add element to db
 export function addToDb(item) {

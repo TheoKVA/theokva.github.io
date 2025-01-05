@@ -1,12 +1,12 @@
-// ==============
-// PAGES ORDERING
-// ==============
-
+// IMPORT
 import { db } from './db.js'
 import { showParameters } from '../main.js'
 
+// HTML
 const pageContainer = document.getElementById('js-page-container');
 const pageTemplate = document.getElementById('js-page-template');
+
+// - - - - - - - - - - - - - - -
 
 // Desktop drag event handlers
 // Variables to track the dragged element and its copy
@@ -229,9 +229,9 @@ function positionDraggedCopy(e) {
 }
 
 // EXEMPLES
-pageContainer.appendChild(createPageElement(0, 'abc', 'https://via.placeholder.com/100'));
-pageContainer.appendChild(createPageElement(1, 'def', 'https://via.placeholder.com/100/0000FF'));
-pageContainer.appendChild(createPageElement(2, 'ghi', 'https://via.placeholder.com/100/FF0000'));
-pageContainer.appendChild(createPageElement(3, 'abc', 'https://via.placeholder.com/100'));
-pageContainer.appendChild(createPageElement(4, 'def', 'https://via.placeholder.com/100/0000FF'));
-pageContainer.appendChild(createPageElement(5, 'ghi', 'https://via.placeholder.com/100/FF0000'));
+// pageContainer.appendChild(createPageElement(0, 'abc', 'https://via.placeholder.com/100'));
+// pageContainer.appendChild(createPageElement(1, 'def', 'https://via.placeholder.com/100/0000FF'));
+// pageContainer.appendChild(createPageElement(2, 'ghi', 'https://via.placeholder.com/100/00FF00'));
+// pageContainer.appendChild(createPageElement(3, 'abc', 'https://via.placeholder.com/100'));
+// pageContainer.appendChild(createPageElement(4, 'def', 'https://via.placeholder.com/100/0000FF'));
+// pageContainer.appendChild(createPageElement(5, 'ghi', 'https://via.placeholder.com/100/FF0000'));

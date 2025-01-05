@@ -3,16 +3,21 @@
 /*   IMPORTS   */
 /* =========== */
 
-/* framework */
+/* FRAMEWORK */
 @import "myFramework.css";
 @import "myToogle.css";
 @import "myButton.css";
 @import "mySlider.css";
 
-/* section */
-@import "sectionParameter.css";
-@import "sectionLoading.css";
-@import "sectionFooter.css";
+/* PAGE */
+@import "sectionPageTop.css";
+@import "sectionPageMiddle.css";
+@import "sectionPageBottom.css";
+@import "sectionPageFooter.css";
+
+/* OVERLAY */
+@import "sectionOverlayParameter.css";
+@import "sectionOverlayLoading.css";
 
 
 /* ==================== */
@@ -20,7 +25,7 @@
 /* ==================== */
 
 :root {
-    --page-background-color: #f8f9fa;
+    --page-background-color: #F6F6F6;
     --radius-ref: 300px;
 }
 
@@ -38,7 +43,10 @@
 body {
     /* TYPO */
     font-family: 'Inter', Arial, sans-serif;
-    color: #212529;
+    color: #000000;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 400;
 
     height: 100%;
     background-color: var(--page-background-color);
@@ -56,33 +64,19 @@ body {
     height: calc(100vh);
     transform-origin: 0 0;
     transform: scale(1);
-    overflow-y: hidden;
-    /* style */
-    background-color: var(--page-background-color);
+    /* overflow-y: hidden; */
 
+    /* style */
     /* padding: 10px; */
+    background-color: var(--page-background-color);
 }
 
 .css-page > * {
-    border: 1px solid blue
-}
-.css-top-section > * {
-    border: 1px solid rgb(255, 139, 139)
+    border: 0px solid blue
 }
 .css-middle-section > * {
-    border: 1px solid rgb(255, 139, 139)
-}
-.css-bottom-section > * {
-    border: 1px solid rgb(255, 139, 139)
+    border: 0px solid rgb(255, 139, 139)
 }
 .css-footer-section > * {
-    border: 1px solid rgb(255, 139, 139)
-}
-
-
-
-button {
-    padding: 5px 10px;
-    font-size: 16px;
-    cursor: pointer;
+    border: 0px solid rgb(255, 139, 139)
 }

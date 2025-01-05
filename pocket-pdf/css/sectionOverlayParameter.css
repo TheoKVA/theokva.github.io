@@ -1,5 +1,5 @@
 /* OUTSIDE */
-#parameters-container {
+.css-parameter-overlay {
     /* position */
     display: none; /* none / flex */
     position: fixed;
@@ -17,7 +17,7 @@
 }
 
 /* Static blurred background */
-#parameters-background {
+.css-parameters-background {
     position: fixed;
     top: 0;
     left: 0;
@@ -34,7 +34,7 @@
 
 /* INSIDE */
 /* Scrollable Page Container */
-#adjustment-container {
+.css-parameter-container {
     /* position */
     position: relative;
     /* top: 0; */
@@ -68,14 +68,14 @@
     /* margin: auto;  */
 }
 
-.css-action-section {
+.css-parameter-action {
     display: flex;
     flex-direction: row;
     gap: 10px;
     flex-shrink: 0;
 }
 
-#image-container {
+.css-parameter-image {
     position: relative; 
     flex: 1 0 auto; /* Allow the container to grow/shrink based on content */
     max-height: calc(100vh - 240px);
@@ -101,7 +101,7 @@
     /* overflow: hidden; */
 }
 
-#image-container #input-image {
+.css-parameter-image #input-image {
     /* border: 1px solid seagreen; */
     /* display: block; */
     /* object-fit: contain; Ensure the image scales proportionally without cropping */

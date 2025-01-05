@@ -1,7 +1,3 @@
-// ============
-// GENERATE PDF
-// ============
-
 // IMPORTS
 import { db, projectSettings } from './db.js'
 import { showLoading, hideLoading } from './loading.js';
@@ -13,6 +9,9 @@ const downloadPdfButton = document.getElementById('btn-download-pdf');
 const qualitySelect = document.getElementById('export-quality-select');
 const compressionSelect = document.getElementById('export-compression-select');
 const formatSelect = document.getElementById('export-format-select');
+
+// - - - - - - - - - - - - - - -
+
 
 // Make download link
 const downloadLink = document.createElement('a');

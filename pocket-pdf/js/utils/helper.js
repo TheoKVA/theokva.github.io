@@ -1,3 +1,5 @@
+// - - - - - - - - - - - - - - -
+
 // Return unique ID string of lenght 8
 export function generateUniqueId() {
     const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';

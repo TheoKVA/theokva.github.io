@@ -1,11 +1,15 @@
 .css-footer-section {
+    padding-top: 10px;
     width: 100%;
+
+    /* inside */
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     gap: 5px;
     
+    /* typo */
     text-align: center;
     font-size: 12px;
     line-height: normal;
