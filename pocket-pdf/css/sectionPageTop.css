@@ -1,5 +1,5 @@
 .css-expandable-section {
-    --initial-height: 150px;
+    --initial-height: 140px;
     --animation-timing: 0.5s;
 
     overflow: hidden;
@@ -37,7 +37,7 @@
     background: none;
     border: none;
     padding: 0px;
-    margin: 8px;
+    margin-bottom: 8px;
     cursor: pointer;
     transition: transform var(--animation-timing) ease;
 }

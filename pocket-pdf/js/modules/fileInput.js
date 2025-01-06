@@ -1,6 +1,6 @@
 // IMPORTS
-import { showLoading } from './loading.js';
-import { scanner } from './externalLib.js'
+import { showLoadingOverlay } from './overlayLoading.js';
+import { scanner } from '../utils/externalLib.js'
 import { showParameters } from '../main.js'
 
 // HTML
@@ -49,7 +49,7 @@ export async function handleFileInput(e) {
     console.log('handleFileInput()', files);
     
     for (const file of files) {
-        showLoading();
+        showLoadingOverlay();
         console.log('Processing file:', file.name);
 
         const reader = new FileReader();

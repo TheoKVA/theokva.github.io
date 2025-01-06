@@ -20,24 +20,6 @@ import { rotateImage, applyLevelsAdjustment } from './modules/imageEditor.js';
 // Use imported functions
 document.addEventListener('dragstart', handleDragStart);
 
-
-OBJECTIFS
-
-    Ajout de param
-        option niveaux
-        option couleurs / BW / auto
-        option format
-        option orientation
-
-    Option pour l'export
-        DPI choix
-        Compression choix
-        Optimisation de la taille du document
-        Choix du format
-
-    possibilité de changer l'ordre des preview
-        drag-drop ?
-
 */
 
 // =========
@@ -47,10 +29,11 @@ OBJECTIFS
 import { db, dbElemById, tempEntrie, defaultEntrie } from './modules/db.js'
 import { createPageElement } from './modules/pageElement.js'
 import { handleFileInput, handleAddBtn, handleFileDragover, handleFileDrop } from './modules/fileInput.js'
-import { showLoading, hideLoading } from './modules/loading.js';
+import { showLoadingOverlay, hideLoadingOverlay } from './modules/overlayLoading.js';
+import { showParameterOverlay, hideParameterOverlay } from './modules/overlayParameter.js';
 
-import { scanner } from './modules/externalLib.js'
-
+// UTILS
+import { scanner } from './utils/externalLib.js'
 import { generateUniqueId } from './utils/helper.js';
 
 
@@ -60,15 +43,6 @@ const downloadPdfButton = document.getElementById('btn-download-pdf');
 const pageContainer = document.getElementById('js-page-container');
 
 
-
-
-
-// INPUT
-const paperWidthMM = 210;
-const paperHeightMM = 297;
-const paperDPI = 300;
-const paperWidth = Math.round( paperWidthMM / 25.4 * paperDPI); // in PX
-const paperHeight = Math.round( paperHeightMM / 25.4 * paperDPI); // in PX
 
 
 
@@ -206,8 +180,8 @@ function handleParametersLoaded() {
     console.log('handleParametersLoaded()');
 
     // UI
-    hideLoading();
-    parametersContainer.style.display = 'flex';
+    hideLoadingOverlay();
+    showParameterOverlay();
 
     // Update scaled dimensions
     // const rect = parametersInputImage.getBoundingClientRect();
@@ -375,7 +349,7 @@ function parametersConfirm() {
     }
 
     // UI
-    showLoading();
+    showLoadingOverlay();
     parametersContainer.style.display = 'none';
 
     // Create the entry to be stored in the db
@@ -428,7 +402,7 @@ function parametersConfirm() {
     Object.assign(tempEntrie, {});
 
     console.log('Processed image updated.');
-    hideLoading();
+    hideLoadingOverlay();
 };
 
 function parametersCancel() {
@@ -586,7 +560,7 @@ function rotateImage(degrees) {
 window.addEventListener('resize', handleResize);
 function handleResize() {
     console.log("Window resized: ", window.innerWidth, "x", window.innerHeight);
-    positionMarkers()
+    positionMarkers();
 }
 
 // LEVELS

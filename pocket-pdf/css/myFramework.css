@@ -33,6 +33,12 @@
 .no-decoration { 
     text-decoration: none; 
 }
+.no-scroll {
+    overflow: hidden;
+}
+.hidden {
+    display: none !important;
+}
 
 
 /* GUIDE TO FLEX : https://css-tricks.com/snippets/css/a-guide-to-flexbox/ */

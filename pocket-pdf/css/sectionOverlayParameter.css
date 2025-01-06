@@ -1,7 +1,7 @@
 /* OUTSIDE */
 .css-parameter-overlay {
     /* position */
-    display: none; /* none / flex */
+    display: flex;
     position: fixed;
     z-index: 9998; /* below loading */
     top: 0;
@@ -85,10 +85,8 @@
     justify-content: center;
     align-items: center;
 
-    /* border: 1px solid rebeccapurple; */
     border-radius: 3px;
-    border: 0px solid rgb(220, 220, 220);
-    background-color: #eee;
+    background-color: #e6e6e6;
 
     /* flex-grow: 1; */
     /* width: 100%; */

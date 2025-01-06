@@ -1,8 +1,8 @@
 // IMPORTS
 import { db, projectSettings } from './db.js'
-import { showLoading, hideLoading } from './loading.js';
+import { showLoadingOverlay, hideLoadingOverlay } from './overlayLoading.js';
 import { isIOS } from '../utils/helper.js';
-import { scanner } from './externalLib.js'
+import { scanner } from '../utils/externalLib.js'
 
 // HTML
 const downloadPdfButton = document.getElementById('btn-download-pdf');
@@ -28,7 +28,7 @@ downloadPdfButton.addEventListener("click", function () {
 export async function generatePDF() {
 
     console.log('Generate PDF button clicked.');
-    showLoading();
+    showLoadingOverlay();
 
     const pdfDoc = await PDFLib.PDFDocument.create();
     console.log('PDF document created.');
@@ -171,7 +171,7 @@ export async function generatePDF() {
     downloadPdfButton.disabled = false;
 
     // Remove the loading element
-    hideLoading();
+    hideLoadingOverlay();
 
     // iOS-specific handling
     if (isIOS()) {
@@ -245,6 +245,7 @@ formatSelect.addEventListener('change', (event) => {
 // --------
 //  HELPER
 // --------
+
 function applyLevelsToMat(src, dst, filter) {
     console.log('Applying levels adjustment with filter:', filter);
 

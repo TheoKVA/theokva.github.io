@@ -9,9 +9,9 @@ export let tempEntrie = {};
 
 // Variable to store all the images
 export const defaultEntrie = {
-    'id': -1,
+    'id': null,
     'pageIndex': -1,
-    'changeOccured': true,
+    'changeOccured': null,
     'imageParameters': { 
         'format': {
             'name': null, // custom / A5 / A4 / A3 -- TO DO
@@ -19,12 +19,12 @@ export const defaultEntrie = {
             'heightMM': null,
         },
         'orientation': 'auto', // auto / vertical / horizontal -- TO DO
-        'colorMode': 'auto', // auto / color / grayscale -- TO DO
+        'colorMode': 'auto', // auto / color / grayscale / blackAndWhite -- TO DO
         'filter': {
-            'black': 15,
-            'middle': 1,
-            'white': 240,
-            'grayscale': false,
+            'black': 15, // default values
+            'middle': 1, // default values
+            'white': 240, // default values
+            'grayscale': false, // default values
         },
     },
     'imageOriginal': {
@@ -48,6 +48,7 @@ export const defaultEntrie = {
     'cornerPoints': {},
 }
 
+// Variable to store the project settings
 export let projectSettings = {
     'format': {
         'name': 'A4',
@@ -58,15 +59,15 @@ export let projectSettings = {
     'compression' : 0.8
 }
 
+// - - - - - - - - - - - - - - -
 
-// HELPERS
 
-// Add element to db
+// Add element to DB
 export function addToDb(item) {
     db.push(item);
 }
 
-// Remove based on id value
+// Remove an element from DB based on id value
 export function removeFromDb(id) {
     const index = db.findIndex(item => item.id === id);
     if (index !== -1) {
@@ -76,6 +77,11 @@ export function removeFromDb(id) {
     return false;
 }
 
+// Grab an element based on it's ID
 export const dbElemById = (id) => {
     return db.find(item => item.id === id);
+}
+
+export function resetTempEntry() {
+
 }
