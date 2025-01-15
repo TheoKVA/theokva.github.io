@@ -78,8 +78,8 @@
 .css-parameter-image {
     position: relative; 
     flex: 1 0 auto; /* Allow the container to grow/shrink based on content */
-    max-height: calc(100vh - 240px);
-    min-height: 300px;
+    max-height: calc(100vh - 267px);
+    min-height: 250px;
     
     display: flex;
     justify-content: center;
@@ -99,7 +99,7 @@
     /* overflow: hidden; */
 }
 
-.css-parameter-image #input-image {
+.css-parameter-image #parameter-image {
     /* border: 1px solid seagreen; */
     /* display: block; */
     /* object-fit: contain; Ensure the image scales proportionally without cropping */
@@ -149,7 +149,7 @@
     height: 100%;
     pointer-events: none; /* Ignore pointer events */
 }
-#highlight-polygon {
+#highlight-edge-polygon {
     fill: rgba(0, 0, 0, 0.0);
     stroke: rgba(0, 255, 208, 1);
     stroke-width: 1;

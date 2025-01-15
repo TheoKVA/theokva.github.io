@@ -1,6 +1,7 @@
 // IMPORT
-import { db } from './db.js'
-import { showParameters } from '../main.js'
+import { dbElemById, loadTempEntry } from './db.js'
+import { loadParameterOverlay } from './overlayParameter.js'
+import { disableDownloadSection } from './generatePDF.js'
 
 // HTML
 const pageContainer = document.getElementById('js-page-container');
@@ -14,21 +15,61 @@ let draggedElement = null;
 let draggedCopy = null;
 let isDragging = false;
 
+
+
+export function updatePageElement(id) {
+    console.log('> updatePageElement()', id);
+
+    // Retrieve the db item
+    const dbItem = dbElemById(id);
+
+    // Get the page element
+    let page = pageContainer.querySelector(`[data-id="${id}"]`);
+    if (!page) {
+        console.log('New page element');
+        // Create a new page element
+        page = createPageElement(dbItem);
+        pageContainer.appendChild(page);
+    }
+    else {
+        console.log('Existing page element');
+        // Update child content
+        const img = page.querySelector('.page-preview');
+        img.src = dbItem.imagePagePreview.source;
+        // pageContainer.replaceChild(newPage, page); // Update existing element
+    }
+}
+
+export function removePageElement(id) {
+    console.log('> removePageElement()', id);
+
+    // Get the page element
+    const page = pageContainer.querySelector(`[data-id="${id}"]`);
+    if (page) {
+        page.remove();
+    }
+    else {
+        console.log('No page element to remove', id);
+    }
+}
+
 // Helper function to create a new page element
-export function createPageElement(index, id, processedCanvas) {
+function createPageElement(dataEntry) {
+    const { id, pageIndex, imagePagePreview } = dataEntry;
+
     const newPage = pageTemplate.cloneNode(true);
     newPage.style.display = 'block';
     newPage.setAttribute('data-id', id);
-    newPage.style.order = index;
+    newPage.style.order = pageIndex;
     newPage.classList.add('draggable');
     newPage.draggable = true;
 
     // Update child content
     const img = newPage.querySelector('.page-preview');
-    img.src = (typeof processedCanvas === 'string') ? processedCanvas : processedCanvas.toDataURL('image/jpeg');
+    img.src = imagePagePreview.source || 'https://via.placeholder.com/100';
 
     const indexLabel = newPage.querySelector('.page-index');
-    indexLabel.textContent = `${index + 1}`;
+    indexLabel.textContent = `${pageIndex + 1}`;
 
     // Set up drag-and-drop event listeners
     newPage.addEventListener('dragstart', handleDragStart);
@@ -197,18 +238,21 @@ function cleanDragState() {
 // Function to update indexes and DB after reordering
 function updateIndexes() {
     console.log('updateIndexes()');
-    // Update indexes 
+    // (optional) Disable download section
+    disableDownloadSection();
+
+    // Update all the indexes 
     const children = pageContainer.querySelectorAll('.draggable');
     children.forEach((child) => {
         const targetId = child.getAttribute('data-id');
         const newIndex = parseInt(child.style.order, 10);
 
-        // Change the label
+        // Change the html label
         const indexLabel = child.querySelector('.page-index');
         indexLabel.textContent = `${newIndex + 1}`;
 
         // Update DB
-        const dbItem = db.find(item => item.id === targetId);
+        const dbItem = dbElemById(targetId);
         if (dbItem) dbItem.pageIndex = newIndex;
         else {
             console.log('no element with id', targetId);
@@ -226,6 +270,16 @@ function positionDraggedCopy(e) {
 
     draggedCopy.style.left = `${touch.clientX - offsetX}px`;
     draggedCopy.style.top = `${touch.clientY - offsetY}px`;
+}
+
+function showParameters(id) {
+    console.log('> showParameters()', id);
+
+    // Load the targeted db item
+    loadTempEntry(id);
+
+    // 
+    loadParameterOverlay();
 }
 
 // EXEMPLES

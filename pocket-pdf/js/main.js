@@ -26,20 +26,17 @@ document.addEventListener('dragstart', handleDragStart);
 //  IMPORTS
 // =========
 
-import { db, dbElemById, tempEntrie, defaultEntrie } from './modules/db.js'
-import { createPageElement } from './modules/pageElement.js'
-import { handleFileInput, handleAddBtn, handleFileDragover, handleFileDrop } from './modules/fileInput.js'
-import { showLoadingOverlay, hideLoadingOverlay } from './modules/overlayLoading.js';
-import { showParameterOverlay, hideParameterOverlay } from './modules/overlayParameter.js';
+// import { createPageElement } from './modules/pageElement.js'
+import { handleAddBtn, handleFileDragover, handleFileDrop } from './modules/fileInput.js'
+// import { showLoadingOverlay, hideLoadingOverlay } from './modules/overlayLoading.js';
+// import { showParameterOverlay, hideParameterOverlay } from './modules/overlayParameter.js';
+import { generatePDF, downloadPDF } from './modules/generatePDF.js'
 
-// UTILS
-import { scanner } from './utils/externalLib.js'
-import { generateUniqueId } from './utils/helper.js';
+// POUR LOG
+import { db, consoleLogTempEntry } from './modules/db.js'
 
 
 // HTML
-const generatePdfButton = document.getElementById('btn-generate-pdf');
-const downloadPdfButton = document.getElementById('btn-download-pdf');
 const pageContainer = document.getElementById('js-page-container');
 
 
@@ -51,14 +48,12 @@ const pageContainer = document.getElementById('js-page-container');
 // FILE INPUT
 // ==========
 
-const fileInputDIV = document.getElementById('js-fileInput');
 const addButton = document.getElementById('btn-add-image');
 
 // Handle drag and drop on the window
 window.addEventListener('dragover', handleFileDragover)
 window.addEventListener('drop', handleFileDrop);
 // Handle click
-fileInputDIV.addEventListener('change', handleFileInput);
 addButton.addEventListener('click', handleAddBtn)
 
 
@@ -66,6 +61,80 @@ addButton.addEventListener('click', handleAddBtn)
 // ================
 // IMAGE PARAMETERS
 // ================
+
+
+
+
+
+
+
+
+// ============
+// GENERATE PDF
+// ============
+
+
+const generatePdfButton = document.getElementById('pdf-generate-btn');
+const downloadPdfButton = document.getElementById('pdf-download-btn');
+
+generatePdfButton.addEventListener('click', generatePDF)
+downloadPdfButton.addEventListener('click', downloadPDF)
+
+
+
+
+// ===========
+// CONSOLE LOG
+// ===========
+
+// Add a keydown event listener to the document
+document.addEventListener('keydown', (event) => {
+    // Check if the key pressed is 'C' (case-insensitive)
+    if (event.key.toLowerCase() === 'c') {
+        consoleLogTempEntry();
+    }
+});
+
+
+
+
+
+
+
+
+
+
+/*
+
+// const img = new Image();
+// img.src = parametersInputImage.src;
+
+// img.onload = () => {
+//     // Create the canvas
+//     originalCanvas = document.createElement('canvas');
+//     ctx = originalCanvas.getContext('2d');
+
+//     // Set canvas dimensions
+//     originalCanvas.width = img.width;
+//     originalCanvas.height = img.height;
+
+//     // Draw the image on the canvas
+//     ctx.drawImage(img, 0, 0);
+
+//     // Load the canvas into an OpenCV Mat
+//     src = cv.imread(originalCanvas);
+//     dst = new cv.Mat();
+//     src.copyTo(dst); // Ensure `dst` matches dimensions of `src`
+
+//     // Initialize sliders with default values
+//     // const filter = tempEntrie.imageParameters.filter;
+//     // blackSlider.value = filter.black || 0;
+//     // middleSlider.value = filter.middle || 1;
+//     // whiteSlider.value = filter.white || 255;
+
+//     applyLevelsWithOpenCV(); // Apply initial levels
+// };
+
 
 // HTML
 const parametersContainer = document.getElementById('parameters-overlay');
@@ -686,25 +755,6 @@ function cleanupLevels() {
 
 
 
-
-
-
-
-
-
-
-
-// ============
-// GENERATE PDF
-// ============
-
-import { generatePDF } from './modules/generatePDF.js'
-generatePdfButton.addEventListener('click', generatePDF)
-
-
-
-
-
 // ======
 // HELPER
 // ======
@@ -730,45 +780,5 @@ function scaleCornerPoints(cornerPoints, scaleFactor) {
         },
     };
 }
-
-
-
-
-
-
-
-
-
-
-/*
-
-// const img = new Image();
-// img.src = parametersInputImage.src;
-
-// img.onload = () => {
-//     // Create the canvas
-//     originalCanvas = document.createElement('canvas');
-//     ctx = originalCanvas.getContext('2d');
-
-//     // Set canvas dimensions
-//     originalCanvas.width = img.width;
-//     originalCanvas.height = img.height;
-
-//     // Draw the image on the canvas
-//     ctx.drawImage(img, 0, 0);
-
-//     // Load the canvas into an OpenCV Mat
-//     src = cv.imread(originalCanvas);
-//     dst = new cv.Mat();
-//     src.copyTo(dst); // Ensure `dst` matches dimensions of `src`
-
-//     // Initialize sliders with default values
-//     // const filter = tempEntrie.imageParameters.filter;
-//     // blackSlider.value = filter.black || 0;
-//     // middleSlider.value = filter.middle || 1;
-//     // whiteSlider.value = filter.white || 255;
-
-//     applyLevelsWithOpenCV(); // Apply initial levels
-// };
 
 */

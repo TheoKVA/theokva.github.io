@@ -1,63 +1,68 @@
 // IMPORTS
-import { db, projectSettings } from './db.js'
-import { showLoadingOverlay, hideLoadingOverlay } from './overlayLoading.js';
-import { isIOS } from '../utils/helper.js';
+import { projectSettings, sortedDB } from './db.js'
+import { showLoadingOverlay, hideLoadingOverlay, loadingLog } from './overlayLoading.js';
+import { consoleLogCanvas, isIOS } from '../utils/helper.js';
 import { scanner } from '../utils/externalLib.js'
 
-// HTML
-const downloadPdfButton = document.getElementById('btn-download-pdf');
+// HTML SELECTION
 const qualitySelect = document.getElementById('export-quality-select');
 const compressionSelect = document.getElementById('export-compression-select');
 const formatSelect = document.getElementById('export-format-select');
 
+// HTML DONWLOAD
+const downloadSection = document.getElementById('pdf-download-section');
+const downloadLink = document.getElementById('pdf-download-link');
+const downloadNameInput = document.getElementById('pdf-download-name-input');
+const downloadPdfButton = document.getElementById('pdf-download-btn');
+
+
 // - - - - - - - - - - - - - - -
 
 
-// Make download link
-const downloadLink = document.createElement('a');
-downloadLink.style = 'display: none'; // Invisible link
-document.body.appendChild(downloadLink);
-downloadPdfButton.addEventListener("click", function () {
-    downloadLink.click(); // Trigger the download
-});
+let exportBlob = null;
+let exportBlobUrl = null;
 
-// --------
-//   MAIN
-// --------
+// ------------
+// GENERATE PDF
+// ------------
 
 export async function generatePDF() {
+    console.log('> generatePDF()');
 
-    console.log('Generate PDF button clicked.');
+    // Show loading overlay
     showLoadingOverlay();
+    loadingLog('Generating PDF...');
 
+    // Creat the PDF document shell
     const pdfDoc = await PDFLib.PDFDocument.create();
     console.log('PDF document created.');
 
-    // POPULATE PDF
+    // Retrieve sorted DB
+    const sortedEntries = sortedDB();
 
-    // Sort db by pageIndex, skipping holes in the sequence
-    const sortedPages = db
-        .filter(item => item.pageIndex !== undefined && item.pageIndex >= 0) // Exclude invalid or missing pageIndex
-        .sort((a, b) => a.pageIndex - b.pageIndex); // Sort by pageIndex
+    // For each entry in the db
+    for (const entry of sortedEntries) {
+        // Log the index
+        console.log('Processing entry:', entry.pageIndex);
+        loadingLog(`Processing Page ${entry.pageIndex + 1}...`);
 
-    for (const pageData of sortedPages) {
         // Extract original image
         const originalImg = new Image();
-        originalImg.src = pageData.imageOriginal.source;
+        originalImg.src = entry.imageOriginal.source;
 
         // Wait for the image to load
         await new Promise((resolve) => (originalImg.onload = resolve)); 
 
         // Extract the size values
-        const dpi = pageData.imageParameters?.format?.dpi || projectSettings.format?.dpi;
-        const widthMM = pageData.imageParameters?.format?.widthMM || projectSettings.format.widthMM;
-        const heightMM = pageData.imageParameters?.format?.heightMM || projectSettings.format.heightMM;
+        const dpi = entry.imageParameters?.format?.dpi || projectSettings.format?.dpi;
+        const widthMM = entry.imageParameters?.format?.widthMM || projectSettings.format.widthMM;
+        const heightMM = entry.imageParameters?.format?.heightMM || projectSettings.format.heightMM;
         let widthPx, heightPx;
 
         // Check if height or width is set to 'auto'
         if (heightMM === 'auto' || widthMM === 'auto') {
             // Calculate dimensions based on corner points
-            const { topLeftCorner, topRightCorner, bottomLeftCorner, bottomRightCorner } = pageData.cornerPoints;
+            const { topLeftCorner, topRightCorner, bottomLeftCorner, bottomRightCorner } = entry.cornerPoints;
 
             // Calculate aspect ratio from the corners
             const topWidth = Math.sqrt(Math.pow(topRightCorner.x - topLeftCorner.x, 2) + Math.pow(topRightCorner.y - topLeftCorner.y, 2));
@@ -86,14 +91,14 @@ export async function generatePDF() {
         }
 
         // Use scanner to extract the paper with rotation taken into account
-        const rotation = pageData.imageScaled?.rotation || 0;
+        const rotation = entry.imageScaled?.rotation || 0;
 
         // Prepare canvas dimensions based on rotation
         let finalImageWidth = originalImg.width;
         let finalImageHeight = originalImg.height;
 
-        // Change the aspect ratio if different than 0 or 180
-        if (rotation % 180 !== 0) {
+        // Change the aspect ratio if the image is rotated
+        if (rotation == 90 || rotation == 270) {
             finalImageWidth = originalImg.height;
             finalImageHeight = originalImg.width;
         }
@@ -104,14 +109,17 @@ export async function generatePDF() {
         rotatedCanvas.height = finalImageHeight;
         const rotatedCtx = rotatedCanvas.getContext('2d');
 
-        // Apply rotation
+        // Apply rotation to the canvas
         rotatedCtx.translate(rotatedCanvas.width / 2, rotatedCanvas.height / 2);
         rotatedCtx.rotate((rotation * Math.PI) / 180);
         rotatedCtx.drawImage(originalImg, -originalImg.width / 2, -originalImg.height / 2);
         
         // Extract paper from the rotated canvas using scanner
-        // const extractedCanvas = scanner.extractPaper(rotatedCanvas, widthPx, heightPx, pageData.cornerPoints);
-        const extractedCanvas = scanner.extractPaper(rotatedCanvas, widthPx, heightPx, pageData.cornerPoints);
+        // const extractedCanvas = scanner.extractPaper(rotatedCanvas, widthPx, heightPx, entry.cornerPoints);
+        const extractedCanvas = scanner.extractPaper(rotatedCanvas, widthPx, heightPx, entry.cornerPoints);
+
+        console.log('Extracted canvas:');
+        consoleLogCanvas(extractedCanvas);
 
         // Load extracted image into OpenCV for color correction
         const src = cv.imread(extractedCanvas);
@@ -119,7 +127,7 @@ export async function generatePDF() {
         src.copyTo(dst);
 
         // Apply levels adjustments
-        applyLevelsToMat(src, dst, pageData.imageParameters.filter);
+        applyLevelsToMat(src, dst, entry.imageParameters.filter);
 
         // Prepare the canvas
         const finalCanvas = document.createElement('canvas');
@@ -161,52 +169,108 @@ export async function generatePDF() {
     const pdfSizeBytes = blob.size;
     const pdfSizeKB = (blob.size / 1024).toFixed(2);
     const pdfSizeMB = (blob.size / (1024 * 1024)).toFixed(2);
-    console.log(`    > PDF Size: ${pdfSizeMB} MB`);
+    console.log(`PDF Size: ${pdfSizeMB} MB`);
 
-    // Prepare download
-    downloadLink.href = URL.createObjectURL(blob);
-    downloadLink.download = 'document.pdf';
+    // Store the blob for IOS
+    if(isIOS()) {
+        exportBlob = blob;
+    }
+    // Store the object URL for other platforms
+    else {
+        // Prepare download for other platforms
 
-    // Enable the download button
-    downloadPdfButton.disabled = false;
+        // Revoke the object URL
+        if(exportBlobUrl) URL.revokeObjectURL(exportBlobUrl);
+        exportBlobUrl = URL.createObjectURL(blob); // Save the URL for reuse
+        downloadLink.href = exportBlobUrl;
+    }
+
+    // Enable the download section
+    enableDownloadSection();
 
     // Remove the loading element
     hideLoadingOverlay();
 
+    console.log('PDF generation complete.');
+};
+
+
+
+// ------------
+// DOWNLOAD PDF
+// ------------
+
+// Event listener for download button
+export async function downloadPDF() {
+    console.log('> downloadPDF()');
+
+    // Retrieve the targeted name
+    const downloadName = downloadNameInput.value.split('.')[0] || 'myScan';
+    downloadName += '.pdf'
+    downloadLink.download = downloadName;
+
     // iOS-specific handling
     if (isIOS()) {
-        // Enable the Share button for supported devices
-        if (navigator.share) {
-            const file = new File([blob], "document.pdf", { type: 'application/pdf' });
-            downloadPdfButton.addEventListener("click", async () => {
-                try {
-                    // Use the Share API
-                    await navigator.share({
-                        title: "My PDF document",
-                        // text: "Here is the PDF document I generated.",
-                        files: [file], // Share the PDF file
-                    });
-                    console.log("PDF shared successfully!");
-                } catch (error) {
-                    console.error("Error sharing PDF:", error);
-                }
-            });
-        } 
-        else {
-            // ok
+        if (!exportBlob) {
+            console.error('Error: exportBlob is undefined.');
+            return;
         }
-    } else {
-        // Handling for other platforms
-        const blobUrl = URL.createObjectURL(blob);
 
-        // Try to open in a new tab (optional fallback)
-        const pdfWindow = window.open(blobUrl);
-        if (!pdfWindow) {
-            console.warn('Popup blocked. Download link enabled instead.');
+        if (navigator.share) {
+            const file = new File([exportBlob], downloadName, { type: 'application/pdf' });
+            try {
+                await navigator.share({ files: [file] }); // Use the Share API
+                console.log('PDF shared successfully!');
+            } catch (error) {
+                console.error('Error sharing PDF:', error);
+            }
+            return;
+        } else {
+            console.warn('Share API not supported. Download link click instead.');
         }
     }
 
-};
+    // Handling for other platforms
+    if (!exportBlobUrl) {
+        console.error('Error: exportBlobUrl is undefined.');
+        return;
+    }
+
+    const blobUrl = exportBlobUrl;
+    console.log('Opening PDF in new tab');
+
+    // Try to open in a new tab (optional fallback)
+    const pdfWindow = window.open(blobUrl);
+
+    if (!pdfWindow) {
+        console.warn('Popup blocked. Download link clicked instead.');
+        downloadLink.click();
+    }
+
+    URL.revokeObjectURL(blobUrl);
+}
+
+let downloadSectionIsEnable = false;
+
+function enableDownloadSection() {
+    // If we already have the section enable
+    if(downloadSectionIsEnable) return
+
+    downloadSection.dataset.active = true;
+    downloadSectionIsEnable = true;
+}
+
+export function disableDownloadSection() {
+    // If we already have a disabled section
+    if(!downloadSectionIsEnable) return
+
+    // Revoke the URL
+    if(exportBlobUrl) URL.revokeObjectURL(exportBlobUrl);
+
+    // Disable the section
+    downloadSection.dataset.active = false;
+    downloadSectionIsEnable = false
+}
 
 
 // --------
@@ -215,6 +279,9 @@ export async function generatePDF() {
 
 // Event listener for quality (dpi)
 qualitySelect.addEventListener('change', (event) => {
+    // Disable download section if needed
+    disableDownloadSection();
+
     const newDpi = parseInt(event.target.value, 10);
     projectSettings.format.dpi = newDpi;
     console.log(`Project settings updated: DPI set to ${newDpi}`);
@@ -222,6 +289,9 @@ qualitySelect.addEventListener('change', (event) => {
 
 // Event listener for compression
 compressionSelect.addEventListener('change', (event) => {
+    // Disable download section if needed
+    disableDownloadSection();
+
     const newCompression = parseFloat(event.target.value);
     projectSettings.compression = newCompression;
     console.log(`Project settings updated: Compression set to ${newCompression}`);
@@ -229,6 +299,9 @@ compressionSelect.addEventListener('change', (event) => {
 
 // Event listener for format
 formatSelect.addEventListener('change', (event) => {
+    // Disable download section if needed
+    disableDownloadSection();
+
     const selectedOption = event.target.selectedOptions[0]; // Get selected option
     const newFormat = event.target.value;
     const newWidth = parseInt(selectedOption.dataset.width, 10);

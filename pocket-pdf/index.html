@@ -15,11 +15,12 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"> </script>
     <script src="https://cdn.jsdelivr.net/npm/pdf-lib/dist/pdf-lib.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/heic2any/dist/heic2any.min.js"></script>
-    <script src="https://docs.opencv.org/4.7.0/opencv.js" async></script>
+    <script src="https://docs.opencv.org/4.7.0/opencv.js"></script>
+    <!-- <script src="https://docs.opencv.org/4.x/opencv.js"></script> -->
     <script src="https://cdn.jsdelivr.net/gh/ColonelParrot/jscanify@master/src/jscanify.min.js"></script>
 
     <!-- SCRIPT -->
-    <script type="module" src="js/main.js" defer></script>
+    <script type="module" src="js/main.js"></script>
 
     <!-- MOBILE DEBUG -->
     <script src="https://cdn.jsdelivr.net/npm/eruda"></script>
@@ -144,7 +145,7 @@
                 </div>
 
                 <!-- button -->
-                <div id="btn-generate-pdf" class="my-button my-button-27px my-button-blue full-width" style="margin-top: 5px;">
+                <div id="pdf-generate-btn" class="my-button my-button-27px my-button-blue full-width" style="margin-top: 5px;">
                     <p>Generate PDF</p>
                 </div>
 
@@ -152,13 +153,15 @@
 
             <div class="separateur"></div>
 
-            <div class="css-export-side" data-active="false">
+            <div id="pdf-download-section" class="css-export-side" data-active="false">
+                <!-- Download link -->
+                <a id="pdf-download-link" style="display: none"></a>
                 <!-- image -->
                 <img src="src/picto/PDF_image.png" alt="myPDF">
                 <!-- input -->
-                <input type="text" class="css-input css-input-text" value="myScan.pdf" placeholder="PDF name">
+                <input id="pdf-download-name-input" type="text" class="css-input css-input-text" value="myScan.pdf" placeholder="PDF name">
                 <!-- button -->
-                <div id="btn-download-pdf" class="my-button my-button-27px my-button-black" style="margin-top: 5px;">
+                <div id="pdf-download-btn" class="my-button my-button-27px my-button-black" style="margin-top: 5px;">
                     <p>Download PDF</p>
                 </div>
             </div>
@@ -203,14 +206,14 @@
             <!-- Top section -->
             <div class="css-parameter-action" style="gap: 5px;">
                 <!-- Rotate -->
-                <div id="rotate-left-button" class="my-button my-button-square-22px my-button-white">
+                <div id="parameter-rotate-left-button" class="my-button my-button-square-22px my-button-white">
                     <svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <rect x="-0.5" y="0.5" width="8" height="9" transform="matrix(-1 0 0 1 17 8)" fill="#B3B3B3" stroke="#B3B3B3"/>
                         <path d="M2 11H8L5 15L2 11Z" fill="#B3B3B3"/>
                         <path d="M13 3C13.5523 3 14 3.44772 14 4C14 4.55228 13.5523 5 13 5V3ZM13 5C11.5169 5 10.3388 5.06275 9.39764 5.23387C8.46037 5.40428 7.82464 5.67091 7.3747 6.03087C6.51264 6.72051 6 8.03546 6 11H4C4 7.96454 4.48736 5.77949 6.1253 4.46913C6.92536 3.82909 7.91463 3.47072 9.03986 3.26613C10.1612 3.06225 11.4831 3 13 3V5Z" fill="#B3B3B3"/>
                     </svg>                        
                 </div>
-                <div id="rotate-right-button" class="my-button my-button-square-22px my-button-white">
+                <div id="parameter-rotate-right-button" class="my-button my-button-square-22px my-button-white">
                     <svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <rect x="4.5" y="8.5" width="8" height="9" fill="#B3B3B3" stroke="#B3B3B3"/>
                         <path d="M20 11H14L17 15L20 11Z" fill="#B3B3B3"/>
@@ -233,9 +236,9 @@
             </div>
 
             <!-- Image and Corner Adjustment -->
-            <div id="image-container" class="css-parameter-image">
+            <div id="parameter-image-container" class="css-parameter-image">
                 <!-- Image bg -->
-                <img id="input-image" src="https://via.placeholder.com/720x1080/eee?" alt="Loaded Image">
+                <img id="parameter-image" src="https://via.placeholder.com/720x1080/eee?" alt="Loaded Image">
                 <!-- corners -->
                 <div id="top-left-corner" class="corner-marker" style="background-color:red;"></div>
                 <div id="top-right-corner" class="corner-marker"></div>
@@ -244,7 +247,7 @@
                 <!-- edges -->
                 <div id="highlight-container">
                     <svg id="highlight-svg">
-                        <polygon id="highlight-polygon"></polygon>
+                        <polygon id="highlight-edge-polygon"></polygon>
                     </svg>
                 </div>
             </div>
@@ -253,46 +256,73 @@
             <div id="js-grayscale" class="my-toggle" style="--option-count: 3;">
                 <div class="my-toggle-option active" data-option="color">Color</div>
                 <div class="my-toggle-option" data-option="grayscale">Grayscale</div>
-                <div class="my-toggle-option" data-option="black-white">Black & White</div>
+                <div class="my-toggle-option" data-option="black-white">B&W</div>
                 <div class="my-toggle-background"></div>
             </div>
 
-            <!-- Slider 1 -->
-            <div class="my-slider" style="display: none;">
-                <p class="my-slider-label">Description</p>
-                <input type="range" min="0" max="100" value="50" oninput="this.nextElementSibling.innerText = this.value">
-                <p class="my-slider-value">10</p>
-            </div>
-
             <!-- Color Levels Adjustment -->
-            <div>
+            <div style="display:none">
                 <div class="my-slider">
                     <p class="my-slider-label">Black levels:</p>
-                    <input id="black-level" type="range" min="0" max="255" value="15" oninput="this.nextElementSibling.innerText = this.value">
+                    <input id="black-level-old" type="range" min="0" max="255" value="0" oninput="this.nextElementSibling.innerText = this.value">
                     <p class="my-slider-value">15</p>
                 </div>
                 <div class="my-slider">
                     <p class="my-slider-label">Middle levels:</p>
-                    <input id="middle-level" type="range" min="0.05" max="1" step="0.05" value="0.3" oninput="this.nextElementSibling.innerText = this.value">
+                    <input id="middle-level-old" type="range" min="0.05" max="1" step="0.05" value="0.5" oninput="this.nextElementSibling.innerText = this.value">
                     <p class="my-slider-value">0.3</p>
                 </div>
                 <div class="my-slider">
                     <p class="my-slider-label">White levels:</p>
-                    <input id="white-level" type="range" min="0" max="255" value="240" oninput="this.nextElementSibling.innerText = this.value">
+                    <input id="white-level-old" type="range" min="0" max="255" value="255" oninput="this.nextElementSibling.innerText = this.value">
                     <p class="my-slider-value">240</p>
                 </div>
             </div>
-            
+
+            <!-- New color level adjustment -->
+            <div class="flex-row">
+                <div>
+                    <p>Level adjustment</p>
+                </div>
+                <!-- Histogram & handles -->
+                <div id="histogram-container">
+                    <!-- Canvas for the histogram -->
+                    <canvas id="histogram-canvas"></canvas>
+
+                    <div id="histogram-gradient"></div>
+
+                    <!-- Draggable sliders -->
+                    <div id="sliders-container">
+                        <div id="multi-color-sliders" class="slider-group">
+                            <!-- sliders -->
+                            <div class="slider-handle" data-input-id="black-level"></div>
+                            <div class="slider-handle" data-input-id="middle-level"></div>
+                            <div class="slider-handle" data-input-id="white-level"></div>
+                            <!-- inputs -->
+                            <input id="black-level" type="range" min="0" max="255" value="0">
+                            <input id="middle-level" type="range" min="0.05" max="1" step="0.05" value="0.5">
+                            <input id="white-level" type="range" min="0" max="255" value="255" >
+                        </div>
+                        <div id="mono-color-sliders" class="slider-group">
+                            <!-- slider -->
+                            <div class="slider-handle" data-input-id="black-and-white-level"></div>
+                            <!-- inputs -->
+                            <input id="black-and-white-level" type="range" min="0" max="255" value="125">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Action Section -->
-            <div class="flex-row" style="margin-top: 15px; gap: 5px;">
-                <div id="delete-button" class="my-button my-button-27px my-button-white" style="width: 80px; color:#FF7F78;">
+            <div class="flex-row" style="margin-top: 10px; gap: 5px;">
+                <div id="parameter-delete-button" class="my-button my-button-27px my-button-white" style="width: 80px; color:#FF7F78;">
                     <p>Delete</p>
                 </div>
                 <div style="flex:1"></div>
-                <div id="cancel-button" class="my-button my-button-27px my-button-white" style="width: 80px;">
+                <div id="parameter-cancel-button" class="my-button my-button-27px my-button-white" style="width: 80px;">
                     <p>Cancel</p>
                 </div>
-                <div id="confirm-button" class="my-button my-button-27px my-button-blue" style="width: 80px;">
+                <div id="parameter-save-button" class="my-button my-button-27px my-button-blue" style="width: 80px;">
                     <p>Save</p>
                 </div>
             </div>
@@ -308,19 +338,37 @@
         <div class="css-loading-circle"></div>
         <p id="loading-output">Loading...</p>
     </div>
+
+
     
+
+
+
+
+
+
+
+
+
+
+
+
 
 
     <!-- ================= -->
     <!-- HIDDEN FILE INPUT -->
     <!-- ================= -->
 
-    <input id="js-fileInput" type="file" accept="image/*" multiple style="display: none;">
+    <input id="fileInput" type="file" accept="image/*" multiple style="display: none;">
     <!-- <input id="js-fileInput" type="file" accept="image/*" capture="environment" multiple style="display: none;"> -->
     
 </body>
 
 <script defer>
+
+    // ===========
+    //  MY TOOGLE
+    // ===========
 
     document.querySelectorAll('.my-toggle').forEach((toggleContainer) => {
         const toggleOptions = toggleContainer.querySelectorAll('.my-toggle-option');

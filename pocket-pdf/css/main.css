@@ -14,6 +14,7 @@
 @import "sectionPageMiddle.css";
 @import "sectionPageBottom.css";
 @import "sectionPageFooter.css";
+@import "histogram.css";
 
 /* OVERLAY */
 @import "sectionOverlayParameter.css";

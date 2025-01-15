@@ -39,6 +39,9 @@
 .hidden {
     display: none !important;
 }
+.invisible {
+    opacity: 0 !important;
+}
 
 
 /* GUIDE TO FLEX : https://css-tricks.com/snippets/css/a-guide-to-flexbox/ */
