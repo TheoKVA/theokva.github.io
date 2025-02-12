@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CSV/XLS Formatter Tool</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 20px;
+    }
+    h1 {
+      margin-bottom: 20px;
+    }
+    #drop-zone {
+      border: 3px dashed #aaa;
+      border-radius: 8px;
+      padding: 50px;
+      margin: 20px auto;
+      max-width: 500px;
+      color: #666;
+      transition: background-color 0.3s, border-color 0.3s;
+    }
+    #drop-zone.hover {
+      border-color: #333;
+      background-color: #f0f0f0;
+    }
+    #progress {
+      margin-top: 20px;
+      font-weight: bold;
+      color: #007700;
+    }
+  </style>
+</head>
+<body>
+  <h1>CSV/XLS Formatter Tool</h1>
+  <div id="drop-zone">Drag and drop a CSV or XLS/XLSX file here</div>
+  <div id="progress"></div>
+
+  <!-- Load SheetJS (XLSX) library from CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <script>
+
+    const dropZone = document.getElementById('drop-zone');
+    const progressDiv = document.getElementById('progress');
+
+    // Prevent default drag behaviors
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+      dropZone.addEventListener(eventName, e => {
+        e.preventDefault();
+        e.stopPropagation();
+      }, false);
+    });
+
+    // Highlight drop zone when file is dragged over it
+    ['dragenter', 'dragover'].forEach(eventName => {
+      dropZone.addEventListener(eventName, () => dropZone.classList.add('hover'), false);
+    });
+    ['dragleave', 'drop'].forEach(eventName => {
+      dropZone.addEventListener(eventName, () => dropZone.classList.remove('hover'), false);
+    });
+
+    // Handle file drop
+    dropZone.addEventListener('drop', e => {
+      const files = e.dataTransfer.files;
+      if (files.length > 0) {
+        processFile(files[0]);
+      }
+    });
+
+    function processFile(file) {
+        progressDiv.textContent = "Processing file...";
+        const fileName = file.name.toLowerCase();
+        const reader = new FileReader();
+
+        reader.onerror = function(err) {
+            progressDiv.textContent = "Error reading file";
+            console.error(err);
+        };
+
+        // Decide how to read the file based on its extension
+        if (fileName.endsWith('.csv')) {
+            reader.readAsText(file);
+            reader.onload = function(e) {
+                const data = e.target.result;
+                // Parse CSV data using SheetJS (creates a workbook with one sheet)
+                const workbook = XLSX.read(data, { type: 'string' });
+                processWorkbook(workbook, fileName);
+            };
+        } else if (fileName.endsWith('.xls') || fileName.endsWith('.xlsx')) {
+            reader.readAsArrayBuffer(file);
+            reader.onload = function(e) {
+                const data = new Uint8Array(e.target.result);
+                const workbook = XLSX.read(data, { type: 'array' });
+                processWorkbook(workbook, fileName);
+            };
+        } else {
+            progressDiv.textContent = "Unsupported file type. Please drop a CSV or XLS/XLSX file.";
+        }
+    }
+
+    function processWorkbook(workbook, originalFileName) {
+
+        console.log(workbook);
+
+        // Loop over every sheet in the workbook
+        workbook.SheetNames.forEach(sheetName => {
+            const sheet = workbook.Sheets[sheetName];
+                // Iterate over each cell in the sheet
+                for (let cell in sheet) {
+                if (cell[0] === '!') continue;  // Skip metadata keys
+
+                const cellObj = sheet[cell];
+
+                // If the cell is explicitly a Date type, skip processing.
+                if (cellObj.t === 'd') continue;
+                if (cellObj.t === 'n') continue;
+                
+
+                // Process only if the cell value is a string.
+                if (cellObj && typeof cellObj.v === 'string') {
+                    let trimmed = cellObj.v.trim();
+
+                    // Check if the string looks like a date.
+                    // This regex covers common date formats like:
+                    // - dd/mm/yyyy, dd-mm-yyyy, dd.mm.yyyy
+                    // - yyyy/mm/dd, yyyy-mm-dd, yyyy.mm.dd
+                    const dateRegex1 = /^(\d{1,2}[\/\-\.]){2}\d{2,4}$/;
+                    const dateRegex2 = /^\d{4}[\/\-\.]\d{1,2}[\/\-\.]\d{1,2}$/;
+                    if (dateRegex1.test(trimmed) || dateRegex2.test(trimmed)) {
+                        // Assume it's a date string and leave it unchanged.
+                        continue;
+                    }
+
+                    // Remove thousand-separating commas to form a numeric candidate.
+                    let numericCandidate = trimmed.replace(/,/g, '');
+
+                    // Check if the candidate is a valid number.
+                    if (!isNaN(numericCandidate) && numericCandidate !== '') {
+                        let num = Number(numericCandidate);
+                        // If the number is an integer, simply output the integer.
+                        if (Number.isInteger(num)) {
+                            cellObj.v = String(num);
+                        } else {
+                            // Otherwise, it's a float.
+                            // Convert the number to a string.
+                            let s = num.toString();
+                            // If there's a decimal point, split into integer and fraction parts.
+                            if (s.indexOf('.') !== -1) {
+                            let parts = s.split('.');
+                            // If the fractional part is zero, treat it as an integer.
+                            if (parts[1] === "0") {
+                                s = parts[0];
+                            } else {
+                                // Otherwise, replace the period with a comma.
+                                s = s.replace('.', ',');
+                            }
+                            }
+                            cellObj.v = s;
+                        }
+                        // Force the cell type to string.
+                        cellObj.t = 's';
+                    } else {
+                        // If not a valid number, simply update the cell with the trimmed text.
+                        cellObj.v = trimmed;
+                    }
+                }
+            }
+        });
+
+        // After processing, write the workbook back to a file.
+        let outputFileName;
+        if (originalFileName.endsWith('.csv')) {
+            // For CSV, assume only one sheet and convert it back to CSV text.
+            const csv = XLSX.utils.sheet_to_csv(workbook.Sheets[workbook.SheetNames[0]]);
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            outputFileName = originalFileName.replace(/\.csv$/, '_formatted.csv');
+            triggerDownload(blob, outputFileName);
+        } else {
+            // For Excel files, write as XLSX.
+            outputFileName = originalFileName.replace(/(\.xls|\.xlsx)$/, '_formatted.xlsx');
+            const wbout = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+            const blob = new Blob([wbout], { type: 'application/octet-stream' });
+            triggerDownload(blob, outputFileName);
+        }
+        progressDiv.textContent = "Processing complete. Your updated file is downloading...";
+        setTimeout(() => {
+            // reload the current page
+            window.location.reload();
+        }, 1000);
+    }
+
+    // Utility function to trigger a download
+    function triggerDownload(blob, filename) {
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      setTimeout(() => {
+          document.body.removeChild(a);
+          window.URL.revokeObjectURL(url);
+      }, 100);
+    }
+  </script>
+</body>
+</html>

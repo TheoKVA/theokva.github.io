@@ -1,4 +1,110 @@
 
+
+// =============
+//   VARIABLES
+// =============
+
+// Liste de l'équipe
+const teamNames = [
+    'CAMAIL Marie-Anne',
+    'FRANCART Theo',
+    'HYPPOLITE Maurane',
+    'JAQUILLARD Pierry',
+    'MOPIN Lyvan',
+    'RENFER Valerian',
+    'STRAGGIOTTI Emilien',
+    'BARRACO Nicolas',
+    'BEAUGÉ Laurent',
+    'BENVEGNIN Emilie',
+    'NICOLET Olivier',
+    'NIKOULIN Philip',
+    'OCHSNER Estelle',
+    'PASCHE Benoit',
+    'RIZZARDI Anne',
+    'SLETTENHAAR Jan',
+    'BISCHOFF Clementine',
+    'COSTA Thiago',
+    'TRANCHET Florian',
+    'BERCHTOLD Diana',
+    'CECCON Nicolas',
+    'CHARRIER Richard',
+    'CORBEILLE Coline',
+    'ESPINOSA Sebastian',
+    'GARCIA Andrea',
+    'SPAGNOLO Terence',
+    'WILMOT Hector',
+    'CROSTA-BLANCO Emiliano',
+    'FALLOT Jonathan'
+]
+
+// Génère la DB en déduisant automatiquement `nom` depuis `nomBis`
+let db = teamNames.map(fullName => ({
+    nom: fullName.split(' ')[0], // Prend uniquement le premier mot (nom de famille)
+    nomBis: fullName, // Nom complet
+    planification: []
+})).sort((a, b) => a.nom.localeCompare(b.nom)); // Tri alphabétique
+
+
+const potentialNames = [
+    'GROP1', 
+    'GROP2', 
+    'CHEFAT', 
+    'MAP', 
+    'INFRA', 
+    'GÉOP', 
+    'GEOP', 
+    'INFO 35', 
+    'INFO35', 
+    'SPDI', 
+    'SPDE',
+    'LC',
+    'SPORT', 
+    'CA JOUE',
+    'GROP', 
+    'GRAA', 
+    'ACTU', 
+    'DIGITAL',
+    'AGEFI',
+    'FORMATION',
+    'TEMPLATISATION',
+    'BRAND',
+    'VIVANTS',
+    'PAJU',
+    '36.9',
+    'BASIK',
+    'AUTOPROMO',
+    'TP',
+    'ATELIER', 
+    'ENTRET. RH'
+];
+
+
+// ============
+//   DROPDOWN
+// ============
+
+// DOM - rempli le dropdown
+const dropdown = document.getElementById("nameDropdown");
+
+// DOM - Add default option
+const defaultOption = document.createElement("option");
+defaultOption.value = '';
+defaultOption.textContent = '---';
+dropdown.appendChild(defaultOption);
+
+// DOM - All options
+teamNames.sort().forEach(name => {
+    const option = document.createElement("option");
+    option.value = name;
+    option.textContent = name;
+    dropdown.appendChild(option);
+});
+
+// Interaction quand on change la personne
+document.getElementById('nameDropdown').addEventListener('change', populateCalendar);
+
+
+
 // ====================
 //   HANDLE PDF FILES
 // ====================
@@ -69,518 +175,341 @@ function loadPDF(pdfData, fileName) {
 
 
 
-// =============
-//   VARIABLES
-// =============
-
-// Liste pour trouver les noms dans les PDFs
-const equipeNom = [
-    'CAMAIL',
-    'DENIEL',
-    'FRANCART',
-    'HYPPOLITE',
-    'JAQUILLARD',
-    'MOPIN',
-    'RENFER',
-    'SORTAIS',
-    'STRAGGIOTTI',
-    'BARRACO',
-    'BEAUGÉ',
-    'BENVEGNIN',
-    'GOMEZ',
-    'NICOLET',
-    'NIKOULIN',
-    'OCHSNER',
-    'PASCHE',
-    'PERNIN',
-    'RIZZARDI',
-    'SLETTENHAAR',
-    'BISCHOFF',
-    'COSTA',
-    'TRANCHET',
-    'BERCHTOLD',
-    'CECCON',
-    'CHARRIER',
-    'CORBEILLE',
-    'DUFOUR',
-    'ESPINOSA',
-    'FESSLER',
-    'GARCIA',
-    'WILMOT',
-    'CROSTA-BLANCO',
-    'HUG',
-    'FALLOT',
-    'SPAGNOLO'
-]
-
-// Liste pour la création des plannings
-const equipeNomBis = [
-    'CAMAIL Marie-Anne',
-    'DENIEL Tanguy',
-    'FRANCART Theo',
-    'HYPPOLITE Maurane',
-    'JAQUILLARD Pierry',
-    'MOPIN Lyvan',
-    'RENFER Valerian',
-    'SORTAIS Laure-Anne',
-    'STRAGGIOTTI Emilien',
-    'BARRACO Nicolas',
-    'BEAUGÉ Laurent',
-    'BENVEGNIN Emilie',
-    'GOMEZ Jose',
-    'NICOLET Olivier',
-    'NIKOULIN Philip',
-    'OCHSNER Estelle',
-    'PASCHE Benoit',
-    'PERNIN François-Xavier',
-    'RIZZARDI Anne',
-    'SLETTENHAAR Jan',
-    'BISCHOFF Clementine',
-    'COSTA Thiago',
-    'TRANCHET Florian',
-    'BERCHTOLD Diana',
-    'CECCON Nicolas',
-    'CHARRIER Richard',
-    'CORBEILLE Coline',
-    'DUFOUR Michel',
-    'ESPINOSA Sebastian',
-    'FESSLER Thomas',
-    'GARCIA Andrea',
-    'SPAGNOLO Terence',
-    'WILMOT Hector',
-    'CROSTA-BLANCO Emiliano',
-    'FALLOT Jonathan'
-]
-
-// Génère la variable pour le planning
-let equipePlanning = equipeNom.map((nom, index) => {
-    
-    let nomBis;
-    // Find the corresponding nomBis value from equipeNomBis
-    for (let fullName of equipeNomBis) {
-        if (fullName.includes(nom)) { nomBis = fullName; break; }
-    }
-
-    return {
-        nom: nom,
-        nomBis: nomBis,
-        planification: []
-    };
-});
-// Sort equipePlanning in alphabetical order based on the nom property
-equipePlanning.sort((a, b) => a.nom.localeCompare(b.nom));
-
-// console.log(equipePlanning);
-
-const potentialNames = [
-    'GROP1', 
-    'GROP2', 
-    'CHEFAT', 
-    'MAP', 
-    'INFRA', 
-    'GÉOP', 
-    'GEOP', 
-    'INFO 35', 
-    'INFO35', 
-    'SPDI', 
-    'SPDE',
-    'LC',
-    'SPORT', 
-    'CA JOUE',
-    'GROP', 
-    'GRAA', 
-    'ACTU', 
-    'DIGITAL',
-    'AGEFI',
-    'FORMATION',
-    'TEMPLATISATION',
-    'BRAND',
-    'VIVANTS',
-    'PAJU',
-    '36.9',
-    'BASIK',
-    'AUTOPROMO',
-    'TP',
-    'ATELIER', 
-    'ENTRET. RH'
-];
-
-
-
-
 // ================
 //   EXTRACT DATA
 // ================
 
-// On extrait les données de la plannification depuis les données des PDF
 function extractPlannification(textContent, fileName) {
     return new Promise((resolve, reject) => {
 
-        // Log
-        // console.log(textContent);
-
-        // ========= GET BOUNDARIES =========
-
-        let Yboundaries = [70]; // Initial boundary (en bas)
+        let Yboundaries = [70]; 
         let Xboundaries = [30, 110, 210, 300, 395, 490, 590, 690, 800];
 
         // Extrait les Yboundaries
-        for(let item of textContent.items) {
-            for (let names of equipeNom) {
-                if (item.str.toUpperCase().includes(names) && item.transform[4] < Xboundaries[1]) {
-                    Yboundaries.push(parseInt(item.transform[5])+20);
+        for (let item of textContent.items) {
+            for (let person of db) {
+                if (item.str.toUpperCase().includes(person.nom) && item.transform[4] < Xboundaries[1]) {
+                    Yboundaries.push(parseInt(item.transform[5]) + 20);
                 }
             }
         }
-        Yboundaries = Yboundaries.sort((a, b) => b - a);
-            // Tri dans l'ordre descendant
-        // console.log(Yboundaries)
-
+        // Tri dans l'ordre descendant
+        Yboundaries.sort((a, b) => b - a);
 
         // ========= EXTRACT RAW TEXT DATA =========
 
-        // Table qui va prendre les informations text de manière 'raw'
-        let table_raw_bis = Array.from({ length: Yboundaries.length-1 }, () => Array(8).fill(""));
+        // Crée une table temporaire pour stocker les données extraites
+        let table_raw_bis = Array.from({ length: Yboundaries.length - 1 }, () => Array(8).fill(""));
 
-        for(let item of textContent.items) {
-            // Get x and y positions from the transform array
+        for (let item of textContent.items) {
             const x = item.transform[4];
             const y = item.transform[5];
 
-            // Get the actual row
             const index_temp = Yboundaries.findIndex((coord, i) => 
                 y <= coord && (i === Yboundaries.length - 1 || y > Yboundaries[i + 1])
             );
             const currentRow = Yboundaries.length - 1 - index_temp;
 
-            if (y > Yboundaries[Yboundaries.length-1] && y < Yboundaries[0]) {
-                
+            if (y > Yboundaries[Yboundaries.length - 1] && y < Yboundaries[0]) {
                 for (let i = 0; i < Xboundaries.length - 1; i++) {
-                    if (x >= Xboundaries[i] && x < Xboundaries[i+1]) {
-                        table_raw_bis[currentRow-1][i] += item.str + ' ';
-                        break;  // Exit the loop once a match is found
+                    if (x >= Xboundaries[i] && x < Xboundaries[i + 1]) {
+                        table_raw_bis[currentRow - 1][i] += item.str + ' ';
+                        break;
                     }
                 }
             }
-            
         }
 
         // Log
-        // console.log(table_raw_bis);
+        // console.log('table_raw_bis', table_raw_bis);
 
 
         // ========= PROCESS DATA =========
 
-        // Inialise l'array qui va contenir toutes les planifications de tout le monde
-        var equipe = [];
-
+        // Extraction et mise à jour directe dans `db`
         // On va pour chaque array dans le tableau (PERSONNE)
-        for(let i = 0; i < table_raw_bis.length; i++) {
+        for (let row of table_raw_bis) {
+            let cleanedName = cleanString(row[0]).toUpperCase();
+            let person = db.find(p => cleanedName.includes(p.nom));
 
-            let tempTable = table_raw_bis[i];
+            if (!person) continue;
 
-            // --- UPDATE NOM DE LA PERSONNE ---
-            let cleanedName = cleanString(tempTable[0]).toUpperCase();
-            let matchingName = equipeNom.find(name => cleanedName.includes(name));
-
-            // On prépare l'objet
-            equipe[i] = { 
-                nom: matchingName || 'NOT FOUND',
-                planification : Array(7).fill(null).map(() => ({horraires: [], nom:'', raw:'', date: new Date()}))
-            }
-
-
-            // --- UPDATE DATE ---
-
+            // On part du premier jour. Dans le nom du fichier.
             let initialDate = fileName.match(/\d{1,2}\.\d{1,2}\.\d{2}/g)[0];
-            let [tempDay, tempMonth, tempYear] = initialDate.split('.').map(Number);
-            tempYear = 2000 + tempYear;
-            let currentDate = new Date(tempYear, tempMonth - 1, tempDay); // -1 on month because months are 0-indexed in JavaScript
-                // On extrait la première date et on initialise un objet DATE
+            let [day, month, year] = initialDate.split('.').map(Number);
+            year += 2000;
+            // let currentDate = new Date(year, month - 1, day);
 
-            // Pour tous les jours on attribu la date et on fait +1
-            for (let j=0; j<7; j++) {
-                equipe[i].planification[j].date = new Date(currentDate);;
-                currentDate.setDate(currentDate.getDate()+1);
-            }
-
+            // Initialize planification for 7 days
+            person.planification = Array(7).fill(null).map((_, index) => ({
+                horaires: [],
+                nom: '',
+                raw: '',
+                date: new Date(year, month - 1, day + index, 12) // Set time to 12:00:00 for time shifts
+            }));
 
             // On va dans toutes les lignes (JOURS)
-            for (let j = 1; j < tempTable.length; j++) {
+            for (let j = 1; j < row.length; j++) {
+                let rawData = row[j].trim();
+                if (!rawData) continue;
 
-                let rawData = tempTable[j];
-                // If empty
-                if (!rawData.trim()) continue;
-            
-                let tempObject = equipe[i].planification[j-1];
-                    // On chope l'objet actuel
+                let tempDay = person.planification[j - 1]; // Get the current day's event
+                tempDay.raw = rawData; // Store raw data
 
-                // --- UPDATE HORRAIRES --
-                let tempHorrairesArray = rawData.match(/\d{2}h\d{2}-\d{2}h\d{2}/g) || [];
-                    // Les horraires
-                for (let k = 0; k < tempHorrairesArray.length; k++) {
-                    // If current horaire is less than the last, assign to the next day
-                    let lastHour = tempObject.horraires.length > 0 ? tempObject.horraires[tempObject.horraires.length-1].split('-')[1].split('h')[0]*1 : -1;
-                    let currentHour = tempHorrairesArray[k].split('h')[0]*1;
-                    if (currentHour >= lastHour) {
-                        tempObject.horraires.push(tempHorrairesArray[k])
-                    } else {
-                        equipe[i].planification[j].horraires.push(tempHorrairesArray[k])
-                    }
-                }
-
-                // --- UPDATE NOM DE LA TACHE ---
-                tempNom = '';
                 for (let word of potentialNames) {
-                    if ( rawData.split('+')[0].toUpperCase().includes(word) ) {
-                        tempNom = word;
-                        break
+                    if (rawData.split('+')[0].toUpperCase().includes(word)) {
+                        tempDay.nom = word;
+                        break;
                     }
                 }
-                tempObject.nom = tempNom;
 
-                // --- UPDATE RAW DATA ---
-                tempObject.raw = rawData;
+                // --- UPDATE horaireS ---
+                let temphorairesArray = rawData.match(/\d{2}h\d{2}-\d{2}h\d{2}/g) || [];
+                for (let k = 0; k < temphorairesArray.length; k++) {
+                    let [startHour] = temphorairesArray[k].split('-')[0].split('h').map(Number);
+                    let lastHour = tempDay.horaires.length > 0 
+                        ? tempDay.horaires[tempDay.horaires.length - 1].split('-')[1].split('h')[0] * 1 
+                        : -1;
 
-                // -- SAVE DATA IN ARRAY --
-                equipe[i].planification[j-1] = tempObject;
-            }                
-
-        }
-
-
-        // ========= THEN =========
-
-        // Log
-        // console.log(equipe);
-
-        // On envoi à makePlannification() et on attends que ça résolve
-        makePlannification(equipe).then(() => {
-            // console.log('OK');
-            resolve();
-        })
-
-    });
-}
-
-// Quand la donnée est extraite, à chaque feuille, on ajoute à la variable globale
-function makePlannification(newDataToAdd) {
-
-    // LOG
-    console.log(newDataToAdd);
-
-    for (const data of newDataToAdd) {
-
-        // On retrouve la personne que l'on veut
-        const personnePlanning = equipePlanning.find(e => e.nom === data.nom);
-        if (!personnePlanning) {
-            console.error(`No equipe found for ${data.nom}`);
-            continue;
-        }
-
-        for (const newPlan of data.planification) {
-            if (newPlan.horraires.length >= 1) {
-                // Check if a planning with the same date already exists for this equipe
-                const existingPlan = personnePlanning.planification.find(p => p.date.getTime() === newPlan.date.getTime());
-
-                if (!existingPlan) {
-                    // Append new planning to personnePlanning and ensure it's in chronological order
-                    personnePlanning.planification.push(newPlan);
-                    personnePlanning.planification.sort((a, b) => a.date.getTime() - b.date.getTime());
+                    if (startHour >= lastHour) {
+                        tempDay.horaires.push(temphorairesArray[k]); // Assign to the same day
+                    } else if (j < 7) {
+                        person.planification[j].horaires.push(temphorairesArray[k]); // Assign to next day
+                    }
                 }
+
             }
         }
-    }
 
-    return Promise.resolve(); 
+        console.log(db);
+        resolve();
+    });
 }
 
 
-// =================
-//   MAKE CALENDAR
-// =================
 
-// DOM - rempli le dropdown
-const dropdown = document.getElementById("nameDropdown");
 
-// DOM - Add default option
-const defaultOption = document.createElement("option");
-defaultOption.value = '';
-defaultOption.textContent = '---';
-dropdown.appendChild(defaultOption);
+// =============
+// CALENDAR ELEM
+// =============
 
-// DOM - All options
-equipeNomBis.sort().forEach(name => {
-    const option = document.createElement("option");
-    option.value = name;
-    option.textContent = name;
-    dropdown.appendChild(option);
+var containerEl = document.getElementById('external-events');
+let calendarEl = document.getElementById('calendar');
+
+
+// initialize the external events
+// -----------------------------------------------------------------
+
+new FullCalendar.Draggable(containerEl, {
+    itemSelector: '.fc-event',
+    eventData: function(eventEl) {
+        return {
+        title: eventEl.innerText,
+        allDay: true,
+        };
+    }
 });
 
-// Interaction quand on change la personne
-document.getElementById('nameDropdown').addEventListener('change', function() {
 
-    // On trouve qui on est
-    const targetName = this.value;
+// initialize the calendar
+// -----------------------------------------------------------------
+let calendar = new FullCalendar.Calendar(calendarEl, {
+    initialView: 'multiMonthYear',
+    multiMonthMaxColumns: 1, // force a single column
+    // initialView: 'dayGridMonth',
+    selectable: true,
+    editable: true,
+    droppable: true, // For external events
+    events: [], // Will be populated dynamically
+    firstDay: 1, // Monday
+    locale: 'fr', // the initial locale. if not specified, uses the first one
+    dateClick: function(info) {
+        dateClicked(info);
+    },
+    eventClick: function(info) {
+        eventClicked(info);
+    },
+    drop: function(info) {
+        eventDroped(info);
+    }
+});
 
-    // On trouve sa planification
-    const personnePlanning = equipePlanning.find(e => e.nomBis === targetName);
+// Populate the calendar with extracted data
+function populateCalendar() {
+
+    // Clear the calendar
+    calendar.removeAllEvents();
+    
+    // Get selected person
+    const targetName = document.getElementById('nameDropdown').value;
+    const personnePlanning = db.find(e => e.nomBis === targetName);
     if (!personnePlanning) {
-        console.error(`No equipe found for ${targetName}`);
+        document.getElementById('generateButton').disabled = true;
         return;
     }
-
-    console.log(personnePlanning);
-    if( personnePlanning.planification.length == 0 ) {
-        console.log('Empty plannification');
-        document.getElementById('calendar-planningTable').style.display = 'none';
-        document.getElementById('calendar-error').style.display = 'inline-block';
-        document.getElementById('generateButton').disabled = true;
-        return
-    }
-
-    document.getElementById('calendar-planningTable').style.display = 'inline-block';
-    document.getElementById('calendar-error').style.display = 'none';
     document.getElementById('generateButton').disabled = false;
 
-    const tableBody = document.querySelector('#planningTable tbody');
-    tableBody.innerHTML = ''; // Clear any existing rows
-
-    // On peuple la table html
+    // Extract events from their planification
     personnePlanning.planification.forEach(plan => {
-        plan.horraires.forEach(horraire => {
+        if (plan.horaires.length > 0) {
 
-            const row = document.createElement('tr');
+            // DATE
+            let formattedDate = plan.date.toISOString().split('T')[0]; // 'YYYY-MM-DD'
+            toggleDateEvent(formattedDate, true);
 
-            // --- Checkbox column ---
-            const checkboxTd = document.createElement('td');
-            const label = document.createElement('label');
-            label.className = 'switch';
-            const checkbox = document.createElement('input');
-            checkbox.type = 'checkbox';
-            checkbox.checked = true;
-            const span = document.createElement('span');
-            span.className = 'slider round';
-            label.appendChild(checkbox);
-            label.appendChild(span);
-            checkboxTd.appendChild(label);
-            row.appendChild(checkboxTd);
+            plan.horaires.forEach(horaire => {
+                let [startHour, startMin] = horaire.split('-')[0].split('h').map(Number);
+                let [endHour, endMin] = horaire.split('-')[1].split('h').map(Number);
+                let eventStart = new Date(plan.date);
+                eventStart.setHours(startHour, startMin);
+                let eventEnd = new Date(plan.date);
+                eventEnd.setHours(endHour, endMin);
+                let eventName = getEventName(plan.nom, plan.raw, horaire);
 
-            // --- Date column ---
-            const dateTd = document.createElement('td');
-            const dateInput = document.createElement('input');
-            dateInput.type = 'text';
-            const weekdays = ['Dim.', 'Lun.', 'Mar.', 'Mer.', 'Jeu.', 'Ven.', 'Sam.'];
-            const dayOfWeek = weekdays[plan.date.getDay()];
-            dateInput.value = `${dayOfWeek} ${plan.date.getDate()}.${plan.date.getMonth() + 1}.${plan.date.getFullYear().toString().slice(-2)}`;
-            dateTd.appendChild(dateInput);
-            row.appendChild(dateTd);
-
-            // --- Hour column ---
-            const hourTd = document.createElement('td');
-            const hourInput = document.createElement('input');
-            hourInput.type = 'text';
-            hourInput.value = horraire;
-            hourTd.appendChild(hourInput);
-            row.appendChild(hourTd);
-
-            // --- Name column ---
-            const nameTd = document.createElement('td');
-            const nameInput = document.createElement('input');
-            nameInput.type = 'text';
-            nameInput.value = 'RTS' + (plan.nom == '' ? '': (' ' + plan.nom)) ;
-            // Exceptions
-            let tempRow = plan.raw.toLowerCase();
-            if ( tempRow.includes('elections fédérales') ) { nameInput.value = 'RTS ELEF' }
-            if ( tempRow.includes('a bon entendeur') ) { nameInput.value = 'RTS ABE' }
-            if ( tempRow.includes('a bon entendeur') && tempRow.includes('grop')) { nameInput.value = 'RTS GROP ABE' }
-            if ( tempRow.includes('mise au point') && !tempRow.includes('chefat')) { nameInput.value = 'RTS MAP' }
-            if ( tempRow.includes('info 35') ) { nameInput.value = 'RTS INFO35' }
-            if ( tempRow.includes('digital sport') ) { nameInput.value = 'RTS DIGI SPORT' }
-            if ( tempRow.includes('refonte actu') ) { nameInput.value = 'RTS ACTU23' }
-            if ( tempRow.includes('autopromotion') ) { nameInput.value = 'RTS AUTOPROMO' }
-            if ( horraire == '10h15-13h15' ) { nameInput.value = 'RTS GROP2' }
-            if ( horraire == '14h30-20h15' ) { nameInput.value = 'RTS GROP2' }
-            if ( tempRow.includes('doublure') ) { nameInput.value += ' (doublure)' }
-            nameTd.appendChild(nameInput);
-            row.appendChild(nameTd);
-
-            // --- Raw info column ---
-            const rawTd = document.createElement('td');
-            const rawInput = document.createElement('input');
-            rawInput.type = 'text';
-            rawInput.style.width = "400px";  // or whatever width you prefer
-            rawToParse = plan.raw
-            rawToParse = rawToParse.replace(/0130|0135|0860|4\)/g, "");
-                // Remove '0130' and '0135'
-            rawToParse = rawToParse.replace(/\d{2}h\d{2}-\d{2}h\d{2}/g, "");
-                // Remove strings matching the hour pattern
-            rawToParse = rawToParse.replace(/\d-\d{5}-\d{4}/g, "");
-            rawToParse = rawToParse.replace(/-\d{5}|-\d{4}/g, "");
-                // Remove strings matching the pattern X-XXXXX-XXXX
-            rawInput.value = cleanString(rawToParse);
-            rawTd.appendChild(rawInput);
-            row.appendChild(rawTd);
-
-            tableBody.appendChild(row);
-        });
+                calendar.addEvent(
+                    {
+                        title: eventName,
+                        start: eventStart,
+                        end: eventEnd,
+                        allDay: false,
+                        description: plan.raw,
+                    }
+                );
+            });
+        }
     });
-});
 
+    // Update FullCalendar
+    calendar.setOption('height', '100%');
+    calendar.render();
+    calendar.today();
+}
+
+// Function to assign names based on raw content
+function getEventName(name, rawContent, horaire) {
+    rawContent = rawContent.toLowerCase();
+
+    if (rawContent.includes('elections fédérales')) return 'ELEF';
+    if (rawContent.includes('a bon entendeur')) return rawContent.includes('grop') ? 'GROP ABE' : 'ABE';
+    if (rawContent.includes('mise au point') && !rawContent.includes('chefat')) return 'MAP';
+    if (rawContent.includes('info 35')) return 'INFO35';
+    if (rawContent.includes('digital sport')) return 'DIGI SPORT';
+    if (rawContent.includes('refonte actu')) return 'ACTU23';
+    if (rawContent.includes('autopromotion')) return 'AUTOPROMO';
+    if (horaire === '10h15-13h15' || horaire === '14h30-20h15') return 'GROP ACTU';
+    if (rawContent.includes('doublure')) return 'RTS (doublure)';
+    if (name == '') return 'RTS';
+
+    return name;
+}
+
+// Function to toggle DATES
+function toggleDateEvent(dateStr, deactivate) {
+    let events = calendar.getEvents(); // Get all events in the calendar
+    let backgroundEvent = events.find(event => event.display === 'background' && event.startStr === dateStr);
+
+    if (backgroundEvent) {
+        if(deactivate) backgroundEvent.remove(); // Remove if already exists
+    } else {
+        calendar.addEvent({
+            start: dateStr,
+            end: dateStr,
+            // overlap: false,
+            display: 'background',
+            color: 'rgb(159, 221, 180)' // Blue transparent background
+        });
+    }
+}
+
+
+// Interactions
+// ----------------------------------
+
+// When we click on a DATE
+function dateClicked(info) {
+    // console.log(info);
+    console.log('dateClicked', info.dateStr);
+    toggleDateEvent(info.dateStr, true);
+}
+// When we click on an EVENT
+// Quand on clique sur un ÉVÉNEMENT
+function eventClicked(info) {
+    if (event.shiftKey) {
+        // Suppression si la touche Maj est enfoncée
+        if (confirm(`🗑 Supprimer l'événement "${info.event.title}" ?`)) {
+            info.event.remove();
+        }
+    } else {
+        let event = info.event;
+        let startTime = event.start.toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" });
+        let endTime = event.end ? event.end.toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" }) : "Heure inconnue";
+        // Sinon, demander un nouveau nom
+        let newName = prompt(
+            `Modifier le nom de l'événement:\n\nNom actuel : ${event.title}\nHeure : ${startTime} - ${endTime}\nDescription : ${event.extendedProps.description || "Aucune description"}\n\n(⚠️ Maintenez Maj enfoncé et cliquez pour supprimer)`,
+            event.title
+        );
+        if (newName !== null && newName.trim() !== "") {
+            event.setProp("title", newName); // Met à jour le titre
+        }
+    }
+}
+
+
+// When we drop an event
+function eventDroped(info) {
+    console.log('eventDroped', info.dateStr);
+    toggleDateEvent(info.dateStr, false);
+}
+
+
+
+
+
+
+// ==========
+//   EXPORT
+// ==========
 
 // DOM - Interraction du bouton
 document.getElementById("generateButton").addEventListener("click", generateICSEvents);
 
-// À partir de la selection on sort le .ICS
 function generateICSEvents() {
-
     console.log('NEW EXPORT');
 
     const ics = window.ics();
+    const events = calendar.getEvents();
 
-    document.querySelectorAll('#planningTable tbody tr').forEach(row => {
+    // Get all background (export filter) dates
+    let exportDates = events
+        .filter(event => event.display === 'background')
+        .map(event => event.startStr); // Extract the date in 'YYYY-MM-DD' format
 
-        const isChecked = row.querySelector('input[type="checkbox"]').checked;
+    console.log("Exporting events for dates:", exportDates);
 
-        if (isChecked) {
-            const dateValue = row.children[1].querySelector('input').value.split(' ')[1].split('.');
-            const hourValue = row.children[2].querySelector('input').value;
-            const nameValue = row.children[3].querySelector('input').value;
-            const rawValue = row.children[4].querySelector('input').value;
+    // Filter events that match the export dates
+    events.forEach(event => {
+        if (event.display === 'background') return; // Skip background events
 
-            const [startHour, startMin] = hourValue.split('-')[0].split('h');
-            const [endHour, endMin] = hourValue.split('-')[1].split('h');
+        let eventDate = formatLocalDate(event.start); // Extract event date
 
-            const startDate = new Date(parseInt(dateValue[2]) + 2000, parseInt(dateValue[1]) - 1, parseInt(dateValue[0]));
-            startDate.setHours(Number(startHour), Number(startMin));
-
-            const endDate = new Date(parseInt(dateValue[2]) + 2000, parseInt(dateValue[1]) - 1, parseInt(dateValue[0]));
-            endDate.setHours(Number(endHour), Number(endMin));
-
-            var EventTemp = {
-                'nameValue': nameValue,
-                'rawValue': rawValue,
-                'startDate': startDate,
-                'endDate': endDate
-            }
-            console.log(EventTemp);
+        if (exportDates.includes(eventDate)) {
+            console.log("Exporting event:", event.title, event.start, event.end);
 
             ics.addEvent(
-                nameValue,
-                rawValue,
+                event.title,
+                event.extendedProps?.description || '',
                 '',
-                startDate,
-                endDate
+                event.start,
+                event.end
             );
         }
     });
 
+    // Download ICS file
     const targetName = document.getElementById('nameDropdown').value;
-    ics.download(`Calendar_for_${targetName}`);
-    
+    console.log("Exporting ICS");
+    ics.download(`Calendar_for_${targetName.replace(' ', '-')}`);
 }
-
-
 
 
 
@@ -590,4 +519,8 @@ function generateICSEvents() {
 
 function cleanString(str) {
     return str.split(' ').filter(Boolean).join(' ');
+}
+
+function formatLocalDate(date) {
+    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
 }

@@ -18,6 +18,9 @@
     <!-- Including GSAP Library -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js" defer></script>
 
+    <!-- Including Calendar Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/6.1.8/index.global.min.js"></script>
+
     <!-- MAIN SCRIPTS -->
     <script src="js/script.js" defer></script>
     <script src="js/animations.js" defer></script>
@@ -60,7 +63,7 @@
             <!-- CALENDAR Section -->
             <div id="calendar-section">
 
-                <span id="calendar-section-close-btn">&times;</span>
+                <span id="calendar-section-close-btn" style="display:none">&times;</span>
 
                 <div id="calendar-section-title" class="overlay-title-div">
                     <p class="title-text">Génère<br>ton Calendrier</p>
@@ -70,9 +73,28 @@
                     </div>
                 </div>
 
-                <div id="calendar-section-content" class="bottom-content-div">
+                <div id="calendar-section-content" class="bottom-content-div full-width full-height flex-column" style="gap:30px; padding:30px;">
 
                     <select id="nameDropdown"></select>
+
+                    <div id="calendar-section-content-calendar" class="flex-row full-width" style="flex:1; gap:10px; max-width: 950px; margin: auto;">
+                        <div id='external-events' style="">
+                            <p><b>Modules Journée</b></p>
+                            <div class='fc-event fc-h-event fc-daygrid-event fc-daygrid-block-event'>
+                                <div class='fc-event-main'>✅ DISPO</div>
+                            </div>
+                            <div class='fc-event fc-h-event fc-daygrid-event fc-daygrid-block-event'>
+                                <div class='fc-event-main'>🏖 VACANCES</div>
+                            </div>
+                            <p><b>Modules xxx</b></p>
+                        </div>
+                        
+                        <div id="calendar-container" style="flex: 1;">
+                            <div id="calendar"></div>
+                        </div>
+                    </div>
+                    
+                    <button id="generateButton" disabled>Exporter le Calendrier (Jours verts)</button>
 
                     <p id='calendar-error' style="display:none">Pas de planification détéctée, upload plus de PDF d'un coup si besoin.</p>
 
@@ -93,7 +115,6 @@
                         </table>
                     </div>
 
-                    <button id="generateButton" disabled>Générer le Calendrier</button>
                 </div>
 
             </div>

@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ExcelJS Formatter Tool</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 20px;
+    }
+    h1 {
+      margin-bottom: 20px;
+    }
+    #drop-zone {
+      border: 3px dashed #aaa;
+      border-radius: 8px;
+      padding: 50px;
+      margin: 20px auto;
+      width: 80%;
+      max-width: 500px;
+      color: #666;
+      transition: background-color 0.3s, border-color 0.3s;
+    }
+    #drop-zone.hover {
+      border-color: #333;
+      background-color: #f0f0f0;
+    }
+    #progress {
+      margin-top: 20px;
+      font-weight: bold;
+      color: #007700;
+    }
+  </style>
+</head>
+<body>
+  <h1>ExcelJS Formatter Tool</h1>
+  <div id="drop-zone">Drag and drop an XLSX file here</div>
+  <div id="progress"></div>
+
+  <!-- Load ExcelJS from a CDN -->
+  <script src="https://unpkg.com/exceljs/dist/exceljs.min.js"></script>
+  <script>
+    const dropZone = document.getElementById('drop-zone');
+    const progressDiv = document.getElementById('progress');
+
+    // Prevent default drag behaviors for the drop zone
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+      dropZone.addEventListener(eventName, e => {
+        e.preventDefault();
+        e.stopPropagation();
+      }, false);
+    });
+
+    // Highlight drop zone when file is dragged over it
+    ['dragenter', 'dragover'].forEach(eventName => {
+      dropZone.addEventListener(eventName, () => dropZone.classList.add('hover'), false);
+    });
+    ['dragleave', 'drop'].forEach(eventName => {
+      dropZone.addEventListener(eventName, () => dropZone.classList.remove('hover'), false);
+    });
+
+    // Handle file drop
+    dropZone.addEventListener('drop', e => {
+      const files = e.dataTransfer.files;
+      if (files.length > 0) {
+        processFile(files[0]);
+      }
+    });
+
+    // Process the dropped file using ExcelJS
+    function processFile(file) {
+      progressDiv.textContent = "Processing file...";
+      const fileName = file.name.toLowerCase();
+      if (!fileName.endsWith('.xlsx')) {
+        progressDiv.textContent = "Unsupported file type. Please drop an XLSX file.";
+        return;
+      }
+      const reader = new FileReader();
+      reader.onerror = function(err) {
+        progressDiv.textContent = "Error reading file";
+        console.error(err);
+      };
+      reader.onload = function(e) {
+        const arrayBuffer = e.target.result;
+        // Create a new ExcelJS workbook and load the file data
+        const workbook = new ExcelJS.Workbook();
+        workbook.xlsx.load(arrayBuffer)
+          .then(() => {
+            processWorkbook(workbook, fileName);
+          })
+          .catch(err => {
+            progressDiv.textContent = "Error loading workbook: " + err;
+            console.error(err);
+          });
+      };
+      reader.readAsArrayBuffer(file);
+    }
+
+    // Process each worksheet and each cell to reformat numeric strings while preserving styling.
+    function processWorkbook(workbook, originalFileName) {
+      workbook.eachSheet((worksheet) => {
+        // Iterate over all rows in the worksheet
+        worksheet.eachRow({ includeEmpty: false }, (row) => {
+          row.eachCell({ includeEmpty: false }, (cell) => {
+            // If the cell value is a Date object, skip processing so that dates are not modified.
+            if (cell.value instanceof Date) return;
+
+            // Process if the cell's value is a string.
+            if (typeof cell.value === 'string') {
+              let trimmed = cell.value.trim();
+
+              // Check if the string looks like a date.
+              // These regex patterns cover common date formats like dd/mm/yyyy, dd-mm-yyyy, dd.mm.yyyy,
+              // and yyyy/mm/dd, yyyy-mm-dd, yyyy.mm.dd.
+              const dateRegex1 = /^(\d{1,2}[\/\-\.]){2}\d{2,4}$/;
+              const dateRegex2 = /^\d{4}[\/\-\.]\d{1,2}[\/\-\.]\d{1,2}$/;
+              if (dateRegex1.test(trimmed) || dateRegex2.test(trimmed)) {
+                return;
+              }
+
+              // Remove thousand-separating commas for numeric checking.
+              let numericCandidate = trimmed.replace(/,/g, '');
+              if (!isNaN(numericCandidate) && numericCandidate !== '') {
+                let num = Number(numericCandidate);
+                // If the number is an integer (or a float with a fractional part of zero), output as an integer.
+                if (Number.isInteger(num)) {
+                  cell.value = String(num);
+                } else {
+                  let s = num.toString();
+                  // If there's a decimal point, split into parts.
+                  if (s.indexOf('.') !== -1) {
+                    let parts = s.split('.');
+                    // If the fractional part is zero, drop it.
+                    if (parts[1] === "0") {
+                      s = parts[0];
+                    } else {
+                      // Otherwise, replace the decimal point with a comma.
+                      s = s.replace('.', ',');
+                    }
+                  }
+                  cell.value = s;
+                }
+              } else {
+                // For non-numeric strings, just update with the trimmed value.
+                cell.value = trimmed;
+              }
+            }
+          });
+        });
+      });
+
+      // Write the workbook back to a buffer and trigger a download.
+      workbook.xlsx.writeBuffer()
+        .then(buffer => {
+          const blob = new Blob([buffer], { type: 'application/octet-stream' });
+          const outputFileName = originalFileName.replace(/(\.xlsx)$/, '_formatted.xlsx');
+          triggerDownload(blob, outputFileName);
+          progressDiv.textContent = "Processing complete. Your updated file is downloading...";
+        })
+        .catch(err => {
+          progressDiv.textContent = "Error writing workbook: " + err;
+          console.error(err);
+        });
+    }
+
+    // Utility function to trigger a download of the Blob as a file.
+    function triggerDownload(blob, filename) {
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      setTimeout(() => {
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      }, 100);
+    }
+  </script>
+</body>
+</html>

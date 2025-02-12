@@ -1,4 +1,10 @@
 
+/* =========== */
+/*   IMPORTS   */
+/* =========== */
+
+@import "./myFramework.css"; 
+
 /* ==================== */
 /*   GLOBAL VARIABLES   */
 /* ==================== */
@@ -148,19 +154,10 @@ body {
 }
 #calendar-section-title {
     background-color: var(--calendar-section-color);
+    cursor: pointer;
 }
 
-#calendar-section-content {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    gap: 30px;
 
-    padding-top: 70px;
-    padding-right: 30px;
-    padding-left: 30px;
-    padding-bottom: 80px;
-}
 
 /* DROPDOWN */
 #nameDropdown {
@@ -176,69 +173,31 @@ body {
     padding-left: 10px;
 }
 
-/* MESSAGE D'ERREUR */
-#calendar-error {
-    font-size: 20px;
-    line-height: 25px;
-    font-weight: 500;
-    text-align: center;
+/* EVENT MENU */
+#external-events {
+    width: 150px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    background: #ffffff;
+}
+#external-events .fc-event {
+    cursor: move;
+    margin: 3px 0px;
+    padding: 0px 3px;
 }
 
-/* TABLE */
-#calendar-planningTable {
-    overflow-y: auto;
-    overflow-x: auto;
+/* CALENDAR */
+.fc-toolbar {
+    padding-top: 10px;
+    padding-left: 20px;
+    padding-right: 20px;
+    margin-bottom: 15px !important;
 }
-#calendar-planningTable table {
-    border-collapse: collapse;
+.fc-highlight {
+    opacity:0 !important;
 }
-#planningTable td {
-    height: 35px;
-    font-size: 22px;
-    border-top: 1px solid rgba(0, 0, 0, 0.696);
-}
-
-/* INPUTS */
-#planningTable input {
-    font-size: 18px;
-    background-color: transparent;
-    padding-top: 3px;
-    padding-bottom: 3px;
-}
-#planningTable tr td:nth-child(1),
-#planningTable tr td:nth-child(2) input,
-#planningTable tr td:nth-child(3) input {
-    text-align: center;
-}
-#planningTable tr td:nth-child(1) > label {
-    margin-top: 7px;
-}
-#planningTable tr td:nth-child(2) input {
-    margin-left: 5px;
-    width: 130px;
-}
-#planningTable tr td:nth-child(3) input {
-    width: 120px;
-}
-#planningTable tr td:nth-child(4) input,
-#planningTable tr td:nth-child(5) input {
-    padding-left: 5px;
-    margin-left: 5px;
-}
-
-/* TABLE SCROLLBAR */
-#calendar-planningTable::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
-}
-#calendar-planningTable::-webkit-scrollbar-track {
-    background: transparent;
-    border-top: 5px solid transparent; 
-}
-#calendar-planningTable::-webkit-scrollbar-thumb {
-    background-color: rgba(0, 0, 0, 0.5);
-    border-radius: 6px;
-    border-top: 5px solid transparent;
+.fc-day-today {
+    background-color: #00000008 !important;
 }
 
 /* DOWNLOAD BUTTON */
@@ -266,7 +225,6 @@ body {
 /* ============== */
 /*     TITLES     */
 /* ============== */
-
 
 .overlay-title-div {
     display: flex; 
@@ -498,8 +456,74 @@ body {
 
 
 
+/* ==================================================== */
+/* ==================================================== */
+/* ==================================================== */
 
+/* MESSAGE D'ERREUR */
+#calendar-error {
+    font-size: 20px;
+    line-height: 25px;
+    font-weight: 500;
+    text-align: center;
+}
 
+/* TABLE */
+#calendar-planningTable {
+    overflow-y: auto;
+    overflow-x: auto;
+}
+#calendar-planningTable table {
+    border-collapse: collapse;
+}
+#planningTable td {
+    height: 35px;
+    font-size: 22px;
+    border-top: 1px solid rgba(0, 0, 0, 0.696);
+}
+
+/* INPUTS */
+#planningTable input {
+    font-size: 18px;
+    background-color: transparent;
+    padding-top: 3px;
+    padding-bottom: 3px;
+}
+#planningTable tr td:nth-child(1),
+#planningTable tr td:nth-child(2) input,
+#planningTable tr td:nth-child(3) input {
+    text-align: center;
+}
+#planningTable tr td:nth-child(1) > label {
+    margin-top: 7px;
+}
+#planningTable tr td:nth-child(2) input {
+    margin-left: 5px;
+    width: 130px;
+}
+#planningTable tr td:nth-child(3) input {
+    width: 120px;
+}
+#planningTable tr td:nth-child(4) input,
+#planningTable tr td:nth-child(5) input {
+    padding-left: 5px;
+    margin-left: 5px;
+}
+
+/* TABLE SCROLLBAR */
+#calendar-planningTable::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+#calendar-planningTable::-webkit-scrollbar-track {
+    background: transparent;
+    border-top: 5px solid transparent; 
+}
+#calendar-planningTable::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.5);
+    border-radius: 6px;
+    border-top: 5px solid transparent;
+}
 
 
 

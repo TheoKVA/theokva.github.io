@@ -138,6 +138,10 @@ export async function generatePDF() {
         // Draw adjusted image on finalCanvas
         cv.imshow(finalCanvas, dst);
 
+        // ===========================================================
+        // Make image color changes
+        
+
         // Clean up OpenCV matrices
         src.delete();
         dst.delete();
@@ -205,12 +209,14 @@ export async function downloadPDF() {
     console.log('> downloadPDF()');
 
     // Retrieve the targeted name
-    const downloadName = downloadNameInput.value.split('.')[0] || 'myScan';
+    let downloadName = downloadNameInput.value.split('.')[0] || 'myScan';
     downloadName += '.pdf'
     downloadLink.download = downloadName;
 
     // iOS-specific handling
     if (isIOS()) {
+        console.log('We have an IOS');
+
         if (!exportBlob) {
             console.error('Error: exportBlob is undefined.');
             return;
@@ -229,25 +235,28 @@ export async function downloadPDF() {
             console.warn('Share API not supported. Download link click instead.');
         }
     }
-
     // Handling for other platforms
-    if (!exportBlobUrl) {
-        console.error('Error: exportBlobUrl is undefined.');
-        return;
+    else {
+        console.log('Not an IOS');
+
+        if (!exportBlobUrl) {
+            console.error('Error: exportBlobUrl is undefined.');
+            return;
+        }
+
+        const blobUrl = exportBlobUrl;
+        console.log('Opening PDF in new tab');
+
+        // Try to open in a new tab (optional fallback)
+        const pdfWindow = window.open(blobUrl);
+
+        if (!pdfWindow) {
+            console.warn('Popup blocked. Download link clicked instead.');
+            downloadLink.click();
+        }
+
+        URL.revokeObjectURL(blobUrl);
     }
-
-    const blobUrl = exportBlobUrl;
-    console.log('Opening PDF in new tab');
-
-    // Try to open in a new tab (optional fallback)
-    const pdfWindow = window.open(blobUrl);
-
-    if (!pdfWindow) {
-        console.warn('Popup blocked. Download link clicked instead.');
-        downloadLink.click();
-    }
-
-    URL.revokeObjectURL(blobUrl);
 }
 
 let downloadSectionIsEnable = false;

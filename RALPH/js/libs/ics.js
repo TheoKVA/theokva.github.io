@@ -108,7 +108,7 @@ var ics = function(uidDomain, prodId) {
 
       //TODO add time and time zone? use moment to format?
       var start_date = new Date(begin);
-      var end_date = new Date(stop);
+      var end_date = !!stop? new Date(stop): new Date(begin);
       var now_date = new Date();
 
       var start_year = ("0000" + (start_date.getFullYear().toString())).slice(-4);
@@ -120,7 +120,7 @@ var ics = function(uidDomain, prodId) {
 
       var end_year = ("0000" + (end_date.getFullYear().toString())).slice(-4);
       var end_month = ("00" + ((end_date.getMonth() + 1).toString())).slice(-2);
-      var end_day = ("00" + ((end_date.getDate()).toString())).slice(-2);
+      var end_day = ("00" + ((!!stop? end_date.getDate() : end_date.getDate()+1).toString())).slice(-2);
       var end_hours = ("00" + (end_date.getHours().toString())).slice(-2);
       var end_minutes = ("00" + (end_date.getMinutes().toString())).slice(-2);
       var end_seconds = ("00" + (end_date.getSeconds().toString())).slice(-2);
@@ -185,10 +185,10 @@ var ics = function(uidDomain, prodId) {
         'CLASS:PUBLIC',
         'DESCRIPTION:' + description,
         'DTSTAMP;VALUE=DATE-TIME:' + now,
-        'DTSTART;VALUE=DATE-TIME:' + start,
-        'DTEND;VALUE=DATE-TIME:' + end,
+        'DTSTART;TZID=Europe/Paris:' + start,
+        'DTEND;TZID=Europe/Paris:' + end,
         'LOCATION:' + location,
-        'SUMMARY;LANGUAGE=en-us:' + subject,
+        'SUMMARY;LANGUAGE=fr-fr:' + subject,
         'TRANSP:TRANSPARENT',
         'END:VEVENT'
       ];
@@ -219,7 +219,9 @@ var ics = function(uidDomain, prodId) {
 
       var blob;
       if (navigator.userAgent.indexOf('MSIE 10') === -1) { // chrome or firefox
-        blob = new Blob([calendar], {type: "text/calendar;charset=utf-8"});
+        // blob = new Blob([calendar], {type: "text/calendar;charset=utf-8"});
+        const encoder = new TextEncoder(); 
+        blob = new Blob([encoder.encode(calendar)], {type: "text/calendar"});
       } else { // ie
         var bb = new BlobBuilder();
         bb.append(calendar);

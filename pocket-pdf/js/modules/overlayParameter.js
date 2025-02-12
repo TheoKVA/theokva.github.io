@@ -641,7 +641,7 @@ function parametersDelete() {
     console.log('> parametersDelete()');
 
     // Cleanup
-    cleanup();
+    cleanupVariables();
 
     // Remove page element
     removePageElement(tempEntry.id);
@@ -684,7 +684,8 @@ function scaleCornerPoints(cornerPoints, scaleFactor) {
 }
 
 // Clean up at the end
-function cleanup() {
+function cleanupVariables() {
+    console.log('cleanupVariables()');
     if (workingSrc) workingSrc.delete();
     if (workingCvIsSet) workingCvIsSet = false;
     if (previewImageIsSet) previewImageIsSet = false;

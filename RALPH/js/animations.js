@@ -117,10 +117,17 @@ uploadSection.addEventListener('click', function() {
     // getReadyForCalendar();
 });
 
+
+
 const uploadSectionTitle = document.getElementById("upload-section-title");
 const calendarSectionTitle = document.getElementById("calendar-section-title");
 const calendarSectionClose = document.getElementById("calendar-section-close-btn");
 let calendarSectionIsOpen = false
+
+// Simule le clic
+calendarSection.addEventListener('click', function() {
+    getReadyForCalendar();
+});
 
 function getReadyForCalendar() {
 
