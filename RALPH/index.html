@@ -22,7 +22,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/6.1.8/index.global.min.js"></script>
 
     <!-- MAIN SCRIPTS -->
-    <script src="js/script.js" defer></script>
+    <script src="js/main.js" defer></script>
     <script src="js/animations.js" defer></script>
 
     <!-- Style -->
@@ -78,19 +78,45 @@
                     <select id="nameDropdown"></select>
 
                     <div id="calendar-section-content-calendar" class="flex-row full-width" style="flex:1; gap:10px; max-width: 950px; margin: auto;">
-                        <div id='external-events' style="">
-                            <p><b>Modules Journée</b></p>
-                            <div class='fc-event fc-h-event fc-daygrid-event fc-daygrid-block-event'>
-                                <div class='fc-event-main'>✅ DISPO</div>
+                        <div id='external-events' class="flex-column" style="gap:10px">
+                            <div class="flex-column" style="gap: 3px;">
+                                <p><b>Modules Journée</b></p>
+                                <div class='fc-event fc-h-event fc-daygrid-event fc-daygrid-block-event'
+                                    data-info='{ "title": "✅ DISPO", "allDay": "true" }'>
+                                    <div class='fc-event-main'>✅ DISPO</div>
+                                </div>
+                                <div class='fc-event fc-h-event fc-daygrid-event fc-daygrid-block-event'
+                                    data-info='{ "title": "⛱ VACANCES", "allDay": "true" }'>
+                                    <div class='fc-event-main' >⛱ VACANCES</div>
+                                </div>
                             </div>
-                            <div class='fc-event fc-h-event fc-daygrid-event fc-daygrid-block-event'>
-                                <div class='fc-event-main'>🏖 VACANCES</div>
+                            <div class="flex-column" style="gap: 3px;">
+                                <p><b>Modules de Base</b></p>
+                                <div class='fc-event fc-h-event fc-daygrid-event fc-daygrid-block-event'
+                                    data-info='[
+                                        { "title": "ATELIER", "startTime": "09:00", "endTime": "13:00" },
+                                        { "title": "ATELIER", "startTime": "14:00", "endTime": "18:00" }
+                                    ]'>
+                                    <div class='fc-event-main'>ATELIER</div>
+                                </div>
+
+                                <div class='fc-event fc-h-event fc-daygrid-event fc-daygrid-block-event'
+                                    data-info='[
+                                        { "title": "GROP ACTU", "startTime": "10:45", "endTime": "13:00" },
+                                        { "title": "GROP ACTU", "startTime": "14:30", "endTime": "20:15" }
+                                    ]'>
+                                    <div class='fc-event-main'>GROP ACTU</div>
+                                </div>
                             </div>
-                            <p><b>Modules xxx</b></p>
                         </div>
                         
-                        <div id="calendar-container" style="flex: 1;">
+                        <div id="calendar-container" class="full-height" style="flex: 1;">
                             <div id="calendar"></div>
+                            <style>
+                                .loading {
+                                    opacity: 0.5
+                                }
+                            </style>
                         </div>
                     </div>
                     

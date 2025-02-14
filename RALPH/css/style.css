@@ -178,15 +178,21 @@ body {
     width: 150px;
     padding: 10px;
     border: 1px solid #ccc;
+    border-radius: 5px;
     background: #ffffff;
 }
 #external-events .fc-event {
     cursor: move;
-    margin: 3px 0px;
     padding: 0px 3px;
 }
 
 /* CALENDAR */
+#calendar-container {
+    background-color: white;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+
+}
 .fc-toolbar {
     padding-top: 10px;
     padding-left: 20px;
@@ -197,6 +203,9 @@ body {
     opacity:0 !important;
 }
 .fc-day-today {
+    background-color: #00000013 !important;
+}
+.fc-day-sat, .fc-day-sun {
     background-color: #00000008 !important;
 }
 
