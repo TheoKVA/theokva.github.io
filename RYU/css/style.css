@@ -1,0 +1,612 @@
+
+/* =========== */
+/*   IMPORTS   */
+/* =========== */
+
+@import "./myFramework.css"; 
+
+/* ==================== */
+/*   GLOBAL VARIABLES   */
+/* ==================== */
+
+:root {
+    --background-color: #f8f9fa;
+    --upload-section-color: #dee2e6;
+    --calendar-section-color: #dee2e6;
+    --bottom-section-color: #adb5bd;
+    --icons-background-color: #adb5bd;
+
+    --radius-ref: 300px;
+    --flex-gap: 7px;
+    --title-gap: 12px;
+
+    /* [0,0] en haut à gauche */
+    --cross-X: 50;
+    --cross-X-plus: 0;
+    --cross-Y: 100;
+    --cross-Y-plus: 0;
+    --fold-direction: 'row';
+}
+
+*,
+*::before,
+*::after {
+    margin: 0;
+    padding: 0;
+    border: none;
+    box-sizing: border-box; /* To make sure padding doesn't increase the overall width */
+}
+
+body {
+    font-family: Arial, sans-serif;
+    color: #212529;
+}
+  
+
+
+
+/* ============= */
+/*   MAIN PAGE   */
+/* ============= */
+
+.page {
+    transform: scale(1);
+    transform-origin: 0 0;
+
+    position: relative;
+    padding: 10px;
+    height: calc(100vh);
+    background-color: var(--background-color);
+    overflow-y: hidden;
+}
+
+#content-section {
+    height: 100%; 
+    width: 100%;
+    /* max-width: 900px; */
+    margin-left: auto;
+    margin-right: auto;
+
+    position: relative;
+    z-index: 0;
+
+    display: flex;
+    flex-direction: column;
+    gap: var(--flex-gap);
+}
+
+#info-button {
+    position: fixed ;
+    z-index: 1;
+    left: 0;
+    bottom: 0;
+    margin: 20px;
+    cursor: pointer;
+
+    opacity: 100%;
+    width: 120px;
+    height: 120px;
+}
+#info-button .title-icon-bg {
+    border-radius: 60px;
+    background: white;
+    box-shadow: rgba(149, 157, 165, 0.4) 0px 4px 24px;
+}
+#info-button .title-icon-picto {
+    width: 85px;
+}
+
+
+
+
+/* =============== */
+/*   TOP SECTION   */
+/* =============== */
+
+#top-section {
+    flex: 1; /* Takes up all available space in its parent */
+    display: flex;
+    justify-content: space-between;
+    gap: var(--flex-gap);
+    width: 100%;
+}
+
+
+
+
+/* ================== */
+/*   UPLOAD SECTION   */
+/* ================== */
+
+#upload-section {
+    position: relative;
+    width: calc( (var(--cross-X) + var(--cross-X-plus)) * 1%);
+    overflow-y: auto;
+    overflow-x: auto;
+
+    border-radius: var(--radius-ref);
+    border-top-left-radius: 0px;
+    background-color: var(--upload-section-color);
+}
+
+/* TITLE AND CONTENT */
+#upload-section-title {
+    background-color: var(--upload-section-color);
+    cursor: pointer;
+}
+
+
+
+
+/* ==================== */
+/*   CALENDAR SECTION   */
+/* ==================== */
+
+#calendar-section {
+    position: relative;
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    
+    border-radius: var(--radius-ref);
+    border-bottom-right-radius: 0px;
+    background-color: var(--calendar-section-color);
+}
+#calendar-section-title {
+    background-color: var(--calendar-section-color);
+    cursor: pointer;
+}
+
+
+
+/* DROPDOWN */
+#nameDropdown {
+    height: 30px;
+    width: 60%;
+    border-radius: 5px;
+    margin-left: auto;
+    margin-right: auto;
+    border: 1px solid rgba(46, 46, 46, 0.5);
+
+    font-size: 15px;
+    font-weight: 500;
+    padding-left: 10px;
+}
+
+/* EVENT MENU */
+#external-events {
+    width: 150px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background: #ffffff;
+}
+#external-events .fc-event {
+    cursor: move;
+    padding: 0px 3px;
+}
+
+/* CALENDAR */
+#calendar-container {
+    background-color: white;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+.fc-toolbar {
+    padding-top: 10px;
+    padding-left: 20px;
+    padding-right: 20px;
+    margin-bottom: 15px !important;
+}
+.fc-highlight {
+    opacity:0 !important;
+}
+.fc-day-today {
+    background-color: #fff70013 !important;
+}
+.fc-day-sat, .fc-day-sun {
+    background-color: #00000008 !important;
+}
+
+/* DOWNLOAD BUTTON */
+#generateButton {
+    height: 40px;
+    width: auto;
+    border-radius: 15px;
+
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 15px;
+    padding-right: 15px;
+    
+    background-color: rgb(255, 255, 255);
+    font-size: 22px;
+    font-weight: 600;
+    white-space: nowrap;
+
+    cursor: pointer;
+}
+
+
+
+
+/* ============== */
+/*     TITLES     */
+/* ============== */
+
+.overlay-title-div {
+    display: flex; 
+    flex-direction: column;
+    gap: var(--title-gap);
+    align-items: center;
+    justify-content: center;
+}
+#bottom-section-title {
+    flex-direction: row;
+    gap: 8px;
+}
+.title-text {
+    font-size: 35px;
+    line-height: 40px;
+    font-weight: 600;
+    text-align: center;
+    white-space: nowrap;
+}
+#bottom-section-title .title-text {
+    text-align: left;
+}
+
+.title-icon {
+    position: relative;
+    height: 80px;
+    width: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.title-icon-picto {
+    position: relative;
+    z-index: 1;
+    width: 45px;
+    height: auto;
+    display: block;
+    pointer-events: none;
+}
+#upload-section-title .title-icon-picto {
+    top: -2px;
+}
+#calendar-section-title .title-icon-picto {
+    left: 3px;
+}
+
+.title-icon-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: var(--icons-background-color);
+    border-radius: 50px;
+    z-index: -1;
+}
+#upload-section-title .title-icon-bg {
+    border-top-left-radius: 0px;
+}
+#calendar-section-title .title-icon-bg {
+    border-bottom-right-radius: 0px;
+}
+
+
+
+
+/* ================== */
+/*   BOTTOM SECTION   */
+/* ================== */
+
+#bottom-section {
+    height: calc( (100 - (var(--cross-Y) + var(--cross-Y-plus))) * 1%);
+
+    position: relative;
+    overflow-y: hidden;
+
+    border-radius: 150px;
+    background-color: var(--bottom-section-color);
+}
+
+/* CONTENT */
+#bottom-section-content {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 50px;
+
+    padding-top: 50px;
+    padding-right: 100px;
+    padding-left: 100px;
+    padding-bottom: 150px;
+}
+.bottom-section-content-image {
+    width: 250px;
+    margin-bottom: -30px;
+    margin-left: -10px;
+}
+.bottom-section-content-paragraph {
+    display: flex; 
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 0;
+}
+.bottom-section-content-paragraph h2 {
+    font-size: 25px;
+    line-height: 30px;
+    font-weight: 600;
+}
+.bottom-section-content-paragraph p {
+    font-size: 22px;
+    line-height: 28px;
+    font-weight: 400;
+    padding-left: 30px;
+}
+
+/* CLOSE BTN */
+#calendar-section-close-btn,
+#bottom-section-close-btn {
+    position: sticky;
+    z-index: 2;
+    top: 80px;
+    left: calc(100% - 100px);
+    cursor: pointer;
+    user-select: none;
+
+    font-size: 50px;
+    font-weight: 200;
+    background-color: transparent;
+    
+    color: black;
+}
+#calendar-section-close-btn {
+    top:10px;
+    left:50%;
+    opacity: 50%;
+    font-size: 40px;
+    color: gray;
+}
+#calendar-section-close-btn:hover{
+    color: black;
+}
+#bottom-section-close-btn:hover {
+    color: gray;
+}
+
+
+
+
+/* ============= */
+/*    GENERALE   */
+/* ============= */
+
+/* TITLE AND CONTENT */
+.overlay-title-div {
+    position: absolute;
+    z-index: 3;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    user-select: none;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+
+    /* ANIMATION */
+    visibility: visible;
+    opacity: 100%;
+}
+.bottom-content-div {
+    position: absolute;
+    z-index: 1;
+    top: 0;
+    left: 0;
+}
+
+/* SCROLLBARS */
+#upload-section::-webkit-scrollbar, 
+#calendar-section::-webkit-scrollbar,
+#bottom-section::-webkit-scrollbar {
+    width: 0px;
+    height: 0px;
+}
+#upload-section,
+#calendar-section, 
+#bottom-section {
+    scrollbar-width: none;
+}
+
+
+
+
+/* ============ */
+/*    MOBILES   */
+/* ============ */
+
+@media only screen and (max-width: 700px) {
+    :root {
+        --fold-direction: 'column';
+    }
+    .page {
+        padding: 20px;
+    }
+    #top-section{
+        flex-direction: column;
+    }
+    #upload-section{
+        width:100%;
+        height: calc( (var(--cross-X) + var(--cross-X-plus)) * 1%)
+    }
+    #calendar-section {
+        width:100%;
+    }
+    #bottom-section-content {    
+        padding-top: 100px;
+        padding-right: 50px;
+        padding-left: 50px;
+        padding-bottom: 100px;
+    }
+    #bottom-section-close-btn {
+        top: 10px;
+        left: 50%;
+    }
+}
+
+
+
+
+
+/* ==================================================== */
+/* ==================================================== */
+/* ==================================================== */
+
+/* MESSAGE D'ERREUR */
+#calendar-error {
+    font-size: 20px;
+    line-height: 25px;
+    font-weight: 500;
+    text-align: center;
+}
+
+/* TABLE */
+#calendar-planningTable {
+    overflow-y: auto;
+    overflow-x: auto;
+}
+#calendar-planningTable table {
+    border-collapse: collapse;
+}
+#planningTable td {
+    height: 35px;
+    font-size: 22px;
+    border-top: 1px solid rgba(0, 0, 0, 0.696);
+}
+
+/* INPUTS */
+#planningTable input {
+    font-size: 18px;
+    background-color: transparent;
+    padding-top: 3px;
+    padding-bottom: 3px;
+}
+#planningTable tr td:nth-child(1),
+#planningTable tr td:nth-child(2) input,
+#planningTable tr td:nth-child(3) input {
+    text-align: center;
+}
+#planningTable tr td:nth-child(1) > label {
+    margin-top: 7px;
+}
+#planningTable tr td:nth-child(2) input {
+    margin-left: 5px;
+    width: 130px;
+}
+#planningTable tr td:nth-child(3) input {
+    width: 120px;
+}
+#planningTable tr td:nth-child(4) input,
+#planningTable tr td:nth-child(5) input {
+    padding-left: 5px;
+    margin-left: 5px;
+}
+
+/* TABLE SCROLLBAR */
+#calendar-planningTable::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+#calendar-planningTable::-webkit-scrollbar-track {
+    background: transparent;
+    border-top: 5px solid transparent; 
+}
+#calendar-planningTable::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.5);
+    border-radius: 6px;
+    border-top: 5px solid transparent;
+}
+
+
+
+/* =========== */
+/*    SWITCH   */
+/* =========== */
+/* 
+    Dans l'HTML on veut:
+
+    <label class="switch">
+        <input type="checkbox">
+        <span class="slider round"></span>
+    </label>
+*/
+
+:root {
+    --switch-width: 35px;
+    --switch-height: 19px;
+    --switch-padding: 3px;
+    --switch-color-on: #7c9137;
+    --switch-color-off: #afac9a;
+    --switch-color-toggle: white;
+}
+
+/* Hide default HTML checkbox */
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+/* The switch - the box around the slider */
+.switch {
+    position: relative;
+    display: inline-block;
+    width: var(--switch-width);
+    height: var(--switch-height);
+}
+/* The slider */
+.slider {
+    position: absolute;
+    cursor: pointer;
+    inset: 0;
+    background-color: var(--switch-color-off);
+    -webkit-transition: .4s;
+    transition: .4s;
+}
+.slider:before {
+    position: absolute;
+    content: "";
+    height: calc( var(--switch-height) - (2 * var(--switch-padding)) );
+    width: calc( var(--switch-height) - (2 * var(--switch-padding)) );
+    left: var(--switch-padding);
+    bottom: var(--switch-padding);
+    background-color: var(--switch-color-toggle);
+    -webkit-transition: .4s;
+    transition: .4s;
+}
+
+input:checked + .slider {
+    background-color: var(--switch-color-on);
+}
+input:focus + .slider {
+    box-shadow: 0 0 1px var(--switch-color-on);
+}
+
+input:checked + .slider:before {
+    -webkit-transform: translateX( calc( var(--switch-width) - var(--switch-height)) );
+    -ms-transform: translateX( calc( var(--switch-width) - var(--switch-height)) );
+    transform: translateX( calc( var(--switch-width) - var(--switch-height)) );
+}
+
+/* Rounded sliders */
+.slider.round {
+    border-radius: calc( var(--switch-height)/2 );
+}
+.slider.round:before {
+    border-radius: 50%;
+}
